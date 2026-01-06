@@ -1,16 +1,13 @@
 package com.coldchain.ai.service.impl;
 
 import com.alibaba.cloud.ai.graph.agent.ReactAgent;
-import com.alibaba.cloud.ai.graph.exception.GraphRunnerException;
 import com.coldchain.ai.model.OrderChatResponse;
 import com.coldchain.ai.model.RiskAnalysisRequest;
 import com.coldchain.ai.model.RiskAnalysisResponse;
 import com.coldchain.ai.service.AiAssistantService;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,71 +18,27 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class AiAssistantServiceImpl implements AiAssistantService {
-
-    private final ChatClient.Builder chatClientBuilder;
-
     private final ReactAgent orderAgent;
+    private final ReactAgent riskAgent;
 
-    /**
-     * 风险分析系统提示词
-     */
-    private static final String RISK_ANALYSIS_SYSTEM_PROMPT = """
-            You are a cold chain logistics risk analyst.
-            Analyze the provided temperature data and transport statistics to generate a comprehensive risk report.
-            
-            Consider the following factors:
-            1. Temperature deviations from the acceptable range
-            2. Duration of temperature excursions
-            3. Frequency of temperature fluctuations
-            4. Overall trend (stable, increasing, decreasing)
-            5. Potential impact on cargo quality
-            
-            Provide your analysis in the following JSON format:
-            - riskLevel: Overall risk level ("LOW", "MEDIUM", "HIGH", "CRITICAL")
-            - riskScore: Numeric risk score from 0-100
-            - summary: Brief summary of the risk assessment
-            - temperatureAnalysis: Analysis of temperature patterns
-            - recommendations: Array of recommended actions
-            - potentialIssues: Array of potential issues identified
-            - estimatedCargoCondition: Estimated condition of cargo ("OPTIMAL", "ACCEPTABLE", "COMPROMISED", "DAMAGED")
-            
-            Always respond with valid JSON only.
-            """;
+    public AiAssistantServiceImpl(@Qualifier("orderAgent") ReactAgent orderAgent,
+                                  @Qualifier("riskAnalysisAgent") ReactAgent riskAgent) {
+        this.orderAgent = orderAgent;
+        this.riskAgent = riskAgent;
+    }
 
     @Override
     public OrderChatResponse parseOrderFromNaturalLanguage(String naturalLanguageInput) {
         log.debug("开始解析订单, 输入: {}", naturalLanguageInput);
 
-        BeanOutputConverter<OrderChatResponse> converter = 
-                new BeanOutputConverter<>(OrderChatResponse.class);
-
-//        ChatClient chatClient = chatClientBuilder.build();
-
-//        String response = chatClient.prompt()
-//                .system(ORDER_SYSTEM_PROMPT + "\n\n" + converter.getFormat())
-//                .user(naturalLanguageInput)
-//                .call()
-//                .content();
-
-        String response = "";
+        String response = null;
         try {
             response = orderAgent.call(naturalLanguageInput).getText();
             log.debug("LLM响应: {}", response);
-        } catch (GraphRunnerException e) {
-            log.error("调用订单解析Agent失败", e);
-            OrderChatResponse fallback = new OrderChatResponse();
-            fallback.setRawResponse("Agent call failed: " + e.getMessage());
-            return fallback;
-        }
-
-
-        try {
-            return converter.convert(response);
+            return new ObjectMapper().readValue(response, OrderChatResponse.class);
         } catch (Exception e) {
-            log.error("解析LLM响应失败", e);
-            // 返回一个包含原始响应的对象
+            log.error("订单解析失败", e);
             OrderChatResponse fallback = new OrderChatResponse();
             fallback.setRawResponse(response);
             return fallback;
@@ -96,29 +49,18 @@ public class AiAssistantServiceImpl implements AiAssistantService {
     public RiskAnalysisResponse analyzeTransportRisk(RiskAnalysisRequest request) {
         log.debug("开始分析运输风险, 设备ID: {}", request.getDeviceId());
 
-        BeanOutputConverter<RiskAnalysisResponse> converter = 
-                new BeanOutputConverter<>(RiskAnalysisResponse.class);
-
-        // 构建用户输入
         String userInput = buildRiskAnalysisInput(request);
-
-        ChatClient chatClient = chatClientBuilder.build();
-
-        String response = chatClient.prompt()
-                .system(RISK_ANALYSIS_SYSTEM_PROMPT + "\n\n" + converter.getFormat())
-                .user(userInput)
-                .call()
-                .content();
-
-        log.debug("LLM风险分析响应: {}", response);
-
+        System.out.println(userInput);
+        String response = null;
         try {
-            return converter.convert(response);
+            response = riskAgent.call(userInput).getText();
+            log.debug("LLM风险分析响应: {}", response);
+            return new ObjectMapper().readValue(response, RiskAnalysisResponse.class);
         } catch (Exception e) {
-            log.error("解析风险分析响应失败", e);
+            log.error("风险分析失败", e);
             RiskAnalysisResponse fallback = new RiskAnalysisResponse();
             fallback.setRiskLevel("UNKNOWN");
-            fallback.setSummary("Unable to parse risk analysis: " + e.getMessage());
+            fallback.setSummary("Error during risk analysis: " + e.getMessage());
             fallback.setRawResponse(response);
             return fallback;
         }
