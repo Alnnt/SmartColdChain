@@ -1,0 +1,70 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: service-ai
+  profiles:
+    active: dev
+
+  # 导入 Nacos 配置 (Spring Cloud Alibaba 2023.x 必需)
+  config:
+    import:
+      - optional:nacos:${spring.application.name}.yaml
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
+
+  # 模型API配置由 Nacos 注入
+
+  # Redis配置（用于对话历史缓存）
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:redispw}
+      database: 2
+
+  cloud:
+    nacos:
+      # Nacos服务发现配置
+      discovery:
+        server-addr: localhost:8848
+        namespace: cold-chain-dev
+        group: DEFAULT_GROUP
+      # Nacos配置中心
+      config:
+        server-addr: localhost:8848
+        namespace: cold-chain-dev
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        refresh-enabled: true
+
+# Knife4j API文档配置
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'AI服务'
+      paths-to-match: '/**'
+      packages-to-scan: com.coldchain.ai.controller
+
+# 日志配置
+logging:
+  level:
+    com.coldchain.ai: DEBUG
+    org.springframework.ai: DEBUG
+
+# 端点暴露
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

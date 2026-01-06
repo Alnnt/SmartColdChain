@@ -1,0 +1,110 @@
+server:
+  port: 8074
+
+spring:
+  application:
+    name: service-iot
+  profiles:
+    active: dev
+
+  # 导入 Nacos 配置 (Spring Cloud Alibaba 2023.x 必需)
+  config:
+    import:
+      - optional:nacos:${spring.application.name}.yaml
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
+
+  # MongoDB 配置
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/cold_chain_iot
+      auto-index-creation: true
+
+    # Redis 配置
+    redis:
+      host: localhost
+      port: 6379
+      password: redispw
+      database: 0
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+  # Cloud 配置
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: cold-chain-dev
+        group: DEFAULT_GROUP
+      config:
+        server-addr: localhost:8848
+        namespace: cold-chain-dev
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        refresh-enabled: true
+
+# RocketMQ 配置
+rocketmq:
+  name-server: localhost:9876
+  producer:
+    group: iot-producer-group
+    send-message-timeout: 3000
+    retry-times-when-send-failed: 2
+    retry-times-when-send-async-failed: 2
+
+# Netty 服务器配置
+netty:
+  server:
+    port: 9000
+    boss-threads: 1
+    worker-threads: 8
+    connect-timeout: 30000
+    reader-idle-time: 60
+    writer-idle-time: 60
+    all-idle-time: 120
+    max-frame-length: 1048576
+
+# IoT 业务配置
+iot:
+  # 温度阈值（冷链通常 -25°C ~ 8°C）
+  temperature-min: -25.0
+  temperature-max: 8.0
+  # 湿度阈值
+  humidity-min: 30.0
+  humidity-max: 90.0
+  # 低电量阈值
+  low-battery-threshold: 20
+  # MQ Topic
+  mq-topic: topic-iot-data
+  mq-tag: device-data
+  alarm-topic: topic-iot-alarm
+
+# Knife4j 文档配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'iot-api'
+      paths-to-match: '/**'
+      packages-to-scan: com.coldchain.iot.controller
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+# 日志配置
+logging:
+  level:
+    com.coldchain: debug
+    org.apache.rocketmq: warn
+    io.netty: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

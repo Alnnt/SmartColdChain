@@ -1,0 +1,53 @@
+{
+  "description": "IoT设备数据上报样例（JSON格式）",
+  "note": "设备通过TCP连接发送此格式的JSON数据到Netty服务器（端口9000）",
+  
+  "sample1_综合监测设备": {
+    "deviceId": "DEVICE_001",
+    "deviceType": 4,
+    "temperature": -18.5,
+    "humidity": 65.2,
+    "gps": {
+      "longitude": 116.404,
+      "latitude": 39.915
+    },
+    "battery": 85,
+    "signalStrength": -65,
+    "waybillId": 1234567890,
+    "timestamp": 1704499200000
+  },
+
+  "sample2_温度传感器": {
+    "deviceId": "TEMP_SENSOR_001",
+    "deviceType": 1,
+    "temperature": -20.3,
+    "timestamp": 1704499200000
+  },
+
+  "sample3_GPS定位器": {
+    "deviceId": "GPS_TRACKER_001",
+    "deviceType": 3,
+    "gps": {
+      "longitude": 121.473,
+      "latitude": 31.230
+    },
+    "battery": 92,
+    "timestamp": 1704499200000
+  },
+
+  "sample4_温度异常报警": {
+    "deviceId": "DEVICE_002",
+    "deviceType": 4,
+    "temperature": 15.0,
+    "humidity": 70.0,
+    "gps": {
+      "longitude": 113.264,
+      "latitude": 23.129
+    },
+    "battery": 45,
+    "waybillId": 1234567891,
+    "timestamp": 1704499200000
+  },
+
+  "tcp_test_command": "可使用以下命令测试: echo '{\"deviceId\":\"TEST_001\",\"deviceType\":4,\"temperature\":-18.5,\"humidity\":65.2,\"gps\":{\"longitude\":116.404,\"latitude\":39.915},\"battery\":85,\"timestamp\":1704499200000}' | nc localhost 9000"
+}
