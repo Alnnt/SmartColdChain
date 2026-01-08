@@ -39,7 +39,6 @@ public class IoTMessageProducer {
             Message<String> message = MessageBuilder
                     .withPayload(json)
                     .setHeader("deviceId", deviceData.getDeviceId())
-                    .setHeader("deviceType", deviceData.getDeviceType())
                     .build();
 
             rocketMQTemplate.asyncSend(destination, message, new org.apache.rocketmq.client.producer.SendCallback() {

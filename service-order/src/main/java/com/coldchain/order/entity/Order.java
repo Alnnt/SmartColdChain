@@ -2,6 +2,7 @@ package com.coldchain.order.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.coldchain.common.entity.Address;
 import com.coldchain.common.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,7 +53,7 @@ public class Order extends BaseEntity {
      * 购买数量
      */
     @TableField("count")
-    private Integer count;
+    private Integer productCount;
 
     /**
      * 订单金额
@@ -70,29 +71,11 @@ public class Order extends BaseEntity {
      * 收货地址
      */
     @TableField("address")
-    private String address;
-
-    /**
-     * 联系人
-     */
-    @TableField("contact_name")
-    private String contactName;
-
-    /**
-     * 联系电话
-     */
-    @TableField("contact_phone")
-    private String contactPhone;
+    private Address address;
 
     /**
      * 运单ID
      */
     @TableField("waybill_id")
     private Long waybillId;
-
-    /**
-     * 备注
-     */
-    @TableField("remark")
-    private String remark;
 }

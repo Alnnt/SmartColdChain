@@ -22,9 +22,8 @@ public interface DeviceDataService {
      * 4. 发送到RocketMQ
      *
      * @param message 设备消息
-     * @param rawData 原始JSON数据
      */
-    void processDeviceData(DeviceMessage message, String rawData);
+    void processDeviceData(DeviceMessage message);
 
     /**
      * 获取设备最新数据

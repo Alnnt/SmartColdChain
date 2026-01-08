@@ -1,5 +1,6 @@
 package com.coldchain.iot.model;
 
+import com.coldchain.common.entity.GpsLocation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,11 +27,6 @@ public class DeviceMessage implements Serializable {
     private String deviceId;
 
     /**
-     * 设备类型
-     */
-    private Integer deviceType;
-
-    /**
      * 温度
      */
     private Double temperature;
@@ -51,11 +47,6 @@ public class DeviceMessage implements Serializable {
     private Integer battery;
 
     /**
-     * 信号强度
-     */
-    private Integer signalStrength;
-
-    /**
      * 运单ID
      */
     private Long waybillId;
@@ -64,25 +55,4 @@ public class DeviceMessage implements Serializable {
      * 时间戳（设备端时间，毫秒）
      */
     private Long timestamp;
-
-    /**
-     * GPS坐标内部类
-     */
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class GpsLocation implements Serializable {
-        private static final long serialVersionUID = 1L;
-        
-        /**
-         * 经度
-         */
-        private Double longitude;
-
-        /**
-         * 纬度
-         */
-        private Double latitude;
-    }
 }

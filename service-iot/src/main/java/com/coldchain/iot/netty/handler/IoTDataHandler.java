@@ -88,7 +88,7 @@ public class IoTDataHandler extends SimpleChannelInboundHandler<String> {
                     deviceMessage.getGps());
 
             // 处理设备数据（存储 + 发送MQ）
-            deviceDataService.processDeviceData(deviceMessage, msg);
+            deviceDataService.processDeviceData(deviceMessage);
 
             // 发送确认响应
             sendResponse(ctx, buildSuccessResponse(deviceMessage.getDeviceId()));

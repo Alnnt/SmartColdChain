@@ -47,13 +47,9 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     private static final long DEVICE_STATUS_EXPIRE = 5;
 
     @Override
-    public void processDeviceData(DeviceMessage message, String rawData) {
+    public void processDeviceData(DeviceMessage message) {
         // 1. 转换为存储实体
-        DeviceData deviceData = convertToDeviceData(message, rawData);
-
-        // 2. 检测报警状态
-        Integer alarmStatus = checkAlarmStatus(deviceData);
-        deviceData.setAlarmStatus(alarmStatus);
+        DeviceData deviceData = convertToDeviceData(message);
 
         // 3. 存储到 MongoDB
         deviceDataRepository.save(deviceData);
@@ -63,16 +59,6 @@ public class DeviceDataServiceImpl implements DeviceDataService {
 
         // 5. 发送到 RocketMQ
         messageProducer.sendDeviceData(deviceData);
-
-        // 6. 如果有报警，发送报警消息
-        if (!AlarmStatus.NORMAL.getCode().equals(alarmStatus)) {
-            messageProducer.sendAlarmMessage(deviceData);
-            log.warn("检测到设备报警: deviceId={}, alarmStatus={}, temperature={}, humidity={}",
-                    deviceData.getDeviceId(),
-                    AlarmStatus.of(alarmStatus).getDesc(),
-                    deviceData.getTemperature(),
-                    deviceData.getHumidity());
-        }
     }
 
     @Override
@@ -107,17 +93,13 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     /**
      * 转换为存储实体
      */
-    private DeviceData convertToDeviceData(DeviceMessage message, String rawData) {
+    private DeviceData convertToDeviceData(DeviceMessage message) {
         DeviceData.DeviceDataBuilder builder = DeviceData.builder()
                 .deviceId(message.getDeviceId())
-                .deviceType(message.getDeviceType())
                 .temperature(message.getTemperature())
                 .humidity(message.getHumidity())
-                .battery(message.getBattery())
-                .signalStrength(message.getSignalStrength())
                 .waybillId(message.getWaybillId())
-                .rawData(rawData)
-                .receiveTime(LocalDateTime.now());
+                .timestamp(LocalDateTime.now());
 
         // GPS坐标
         if (message.getGps() != null) {
@@ -156,11 +138,6 @@ public class DeviceDataServiceImpl implements DeviceDataService {
                     data.getHumidity() > ioTConfig.getHumidityMax()) {
                 return AlarmStatus.HUMIDITY_ABNORMAL.getCode();
             }
-        }
-
-        // 低电量检测
-        if (data.getBattery() != null && data.getBattery() < ioTConfig.getLowBatteryThreshold()) {
-            return AlarmStatus.LOW_BATTERY.getCode();
         }
 
         return AlarmStatus.NORMAL.getCode();

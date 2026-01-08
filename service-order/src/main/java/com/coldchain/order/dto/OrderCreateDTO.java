@@ -1,5 +1,6 @@
 package com.coldchain.order.dto;
 
+import com.coldchain.common.entity.Address;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -35,17 +36,11 @@ public class OrderCreateDTO {
     private Long productId;
 
     /**
-     * 商品名称
-     */
-    @NotBlank(message = "商品名称不能为空")
-    private String productName;
-
-    /**
      * 购买数量
      */
     @NotNull(message = "购买数量不能为空")
     @Min(value = 1, message = "购买数量至少为1")
-    private Integer count;
+    private Integer productCount;
 
     /**
      * 订单金额
@@ -55,25 +50,8 @@ public class OrderCreateDTO {
     private BigDecimal amount;
 
     /**
-     * 收货地址
+     * 收货信息
      */
-    @NotBlank(message = "收货地址不能为空")
-    private String address;
-
-    /**
-     * 联系人
-     */
-    @NotBlank(message = "联系人不能为空")
-    private String contactName;
-
-    /**
-     * 联系电话
-     */
-    @NotBlank(message = "联系电话不能为空")
-    private String contactPhone;
-
-    /**
-     * 备注
-     */
-    private String remark;
+    @NotBlank(message = "收货信息不能为空")
+    private Address address;
 }

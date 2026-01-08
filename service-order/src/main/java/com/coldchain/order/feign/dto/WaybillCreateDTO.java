@@ -1,5 +1,6 @@
 package com.coldchain.order.feign.dto;
 
+import com.coldchain.common.entity.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,22 +30,22 @@ public class WaybillCreateDTO {
     /**
      * 收货地址
      */
-    private String address;
+    private Address address;
 
     /**
      * 联系人
      */
-    private String contactName;
+    private String driverName;
 
     /**
      * 联系电话
      */
-    private String contactPhone;
+    private String driverPhone;
 
     /**
-     * 商品名称
+     * 商品 Id
      */
-    private String productName;
+    private Long productId;
 
     /**
      * 商品数量

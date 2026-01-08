@@ -41,11 +41,6 @@ public class DeviceData implements Serializable {
     @Field("device_id")
     private String deviceId;
 
-    /**
-     * 设备类型（1-温度传感器，2-湿度传感器，3-GPS定位器，4-综合监测设备）
-     */
-    @Field("device_type")
-    private Integer deviceType;
 
     /**
      * 温度（摄氏度）
@@ -77,11 +72,6 @@ public class DeviceData implements Serializable {
     @Field("battery")
     private Integer battery;
 
-    /**
-     * 信号强度
-     */
-    @Field("signal_strength")
-    private Integer signalStrength;
 
     /**
      * 报警状态（0-正常，1-温度异常，2-湿度异常，3-设备离线，4-电量不足）
@@ -96,21 +86,9 @@ public class DeviceData implements Serializable {
     private Long waybillId;
 
     /**
-     * 原始数据（JSON格式）
-     */
-    @Field("raw_data")
-    private String rawData;
-
-    /**
      * 数据采集时间（设备上报时间）
      */
     @Indexed
     @Field("timestamp")
     private LocalDateTime timestamp;
-
-    /**
-     * 服务器接收时间
-     */
-    @Field("receive_time")
-    private LocalDateTime receiveTime;
 }

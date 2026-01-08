@@ -39,18 +39,6 @@ public abstract class BaseEntity implements Serializable {
     private LocalDateTime updateTime;
 
     /**
-     * 创建人ID
-     */
-    @TableField(value = "create_by", fill = FieldFill.INSERT)
-    private Long createBy;
-
-    /**
-     * 更新人ID
-     */
-    @TableField(value = "update_by", fill = FieldFill.INSERT_UPDATE)
-    private Long updateBy;
-
-    /**
      * 删除标志（0-未删除，1-已删除）
      */
     @TableLogic

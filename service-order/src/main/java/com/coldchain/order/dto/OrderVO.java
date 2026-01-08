@@ -1,5 +1,6 @@
 package com.coldchain.order.dto;
 
+import com.coldchain.common.entity.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,11 +41,6 @@ public class OrderVO {
     private Long productId;
 
     /**
-     * 商品名称
-     */
-    private String productName;
-
-    /**
      * 购买数量
      */
     private Integer count;
@@ -67,27 +63,12 @@ public class OrderVO {
     /**
      * 收货地址
      */
-    private String address;
-
-    /**
-     * 联系人
-     */
-    private String contactName;
-
-    /**
-     * 联系电话
-     */
-    private String contactPhone;
+    private Address address;
 
     /**
      * 运单ID
      */
     private Long waybillId;
-
-    /**
-     * 备注
-     */
-    private String remark;
 
     /**
      * 创建时间

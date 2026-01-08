@@ -69,10 +69,10 @@ seata:
   registry:
     type: nacos
     nacos:
+      application: seata-server
       server-addr: localhost:8848
       namespace: cold-chain-dev
       group: SEATA_GROUP
-      application: seata-server
   config:
     type: nacos
     nacos:

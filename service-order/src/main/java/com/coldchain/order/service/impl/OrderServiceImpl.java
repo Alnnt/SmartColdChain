@@ -38,7 +38,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final TransportClient transportClient;
 
     /**
-     * 雪花算法ID生成器
+     * 雪花算法 ID生成器
      */
     private final Snowflake snowflake = IdUtil.getSnowflake(1, 1);
 
@@ -50,7 +50,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @GlobalTransactional(name = "create-order-tx", rollbackFor = Exception.class)
     public OrderVO createOrder(OrderCreateDTO dto) {
         log.info("开始创建订单: userId={}, productId={}, count={}",
-                dto.getUserId(), dto.getProductId(), dto.getCount());
+                dto.getUserId(), dto.getProductId(), dto.getProductCount());
 
         // 1. 生成订单编号
         String orderNo = generateOrderNo();
@@ -60,14 +60,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .orderNo(orderNo)
                 .userId(dto.getUserId())
                 .productId(dto.getProductId())
-                .productName(dto.getProductName())
-                .count(dto.getCount())
+                .productCount(dto.getProductCount())
                 .amount(dto.getAmount())
                 .status(OrderStatus.PENDING_PAYMENT.getCode())
                 .address(dto.getAddress())
-                .contactName(dto.getContactName())
-                .contactPhone(dto.getContactPhone())
-                .remark(dto.getRemark())
                 .build();
 
         boolean saved = this.save(order);
@@ -77,23 +73,20 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         log.info("订单创建成功: orderId={}, orderNo={}", order.getId(), orderNo);
 
         // 3. 调用库存服务扣减库存
-        Result<Boolean> inventoryResult = inventoryClient.decreaseStock(dto.getProductId(), dto.getCount());
+        Result<Boolean> inventoryResult = inventoryClient.decreaseStock(dto.getProductId(), dto.getProductCount());
         if (!inventoryResult.isSuccess()) {
             log.error("库存扣减失败: {}", inventoryResult.getMessage());
             throw new BusinessException(ResultCode.INVENTORY_NOT_ENOUGH, inventoryResult.getMessage());
         }
-        log.info("库存扣减成功: productId={}, count={}", dto.getProductId(), dto.getCount());
+        log.info("库存扣减成功: productId={}, count={}", dto.getProductId(), dto.getProductCount());
 
         // 4. 调用运输服务创建运单
         WaybillCreateDTO waybillDTO = WaybillCreateDTO.builder()
                 .orderId(order.getId())
                 .orderNo(orderNo)
                 .address(dto.getAddress())
-                .contactName(dto.getContactName())
-                .contactPhone(dto.getContactPhone())
-                .productName(dto.getProductName())
-                .count(dto.getCount())
-                .remark(dto.getRemark())
+                .productId(dto.getProductId())
+                .count(dto.getProductCount())
                 .build();
 
         Result<WaybillVO> transportResult = transportClient.createWaybill(waybillDTO);
@@ -151,7 +144,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         if (updated) {
             // 回滚库存
-            inventoryClient.rollbackStock(order.getProductId(), order.getCount());
+            inventoryClient.rollbackStock(order.getProductId(), order.getProductCount());
             log.info("订单取消成功，库存已回滚: orderId={}", orderId);
         }
 
