@@ -14,12 +14,13 @@
 
     <!-- ==================== 子模块 ==================== -->
     <modules>
-        <module>cold-chain-common</module>
+        <module>common-model</module>
+        <module>common-core</module>
         <!-- <module>cold-chain-gateway</module> -->
         <!-- <module>cold-chain-auth</module> -->
         <module>service-order</module>
-        <!-- <module>service-inventory</module> -->
-        <!-- <module>service-transport</module> -->
+        <module>service-inventory</module>
+        <module>service-transport</module>
         <module>service-iot</module>
         <module>service-ai</module>
     </modules>
@@ -48,6 +49,7 @@
 
         <!-- Middleware -->
         <redisson.version>3.27.0</redisson.version>
+        <rocketmq.version>2.3.0</rocketmq.version>
 
         <!-- Tools -->
         <lombok.version>1.18.30</lombok.version>
@@ -127,6 +129,13 @@
                 <version>${redisson.version}</version>
             </dependency>
 
+            <!-- RocketMQ -->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq.version}</version>
+            </dependency>
+
             <!-- Hutool Utility -->
             <dependency>
                 <groupId>cn.hutool</groupId>
@@ -168,7 +177,7 @@
             <!-- Internal Modules -->
             <dependency>
                 <groupId>com.coldchain</groupId>
-                <artifactId>cold-chain-common</artifactId>
+                <artifactId>common-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

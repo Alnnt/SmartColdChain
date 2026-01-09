@@ -22,10 +22,10 @@
     </properties>
 
     <dependencies>
-        <!-- Cold Chain Common -->
+        <!-- Common Core -->
         <dependency>
             <groupId>com.coldchain</groupId>
-            <artifactId>cold-chain-common</artifactId>
+            <artifactId>common-core</artifactId>
         </dependency>
 
         <!-- Spring Boot Web -->
