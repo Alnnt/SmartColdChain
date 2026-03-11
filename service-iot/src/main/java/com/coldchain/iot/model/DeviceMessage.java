@@ -11,7 +11,7 @@ import java.io.Serializable;
 /**
  * 设备上报消息（TCP协议解析后的数据）
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Builder

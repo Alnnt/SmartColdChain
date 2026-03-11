@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 /**
  * IoT 服务配置
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Component

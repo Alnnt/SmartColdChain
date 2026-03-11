@@ -8,7 +8,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  * AI服务启动类
  * 提供LLM集成、智能助手、风险分析等AI能力
  *
- * @author coldchain
+ * @author Alnnt
  */
 @SpringBootApplication
 @EnableDiscoveryClient

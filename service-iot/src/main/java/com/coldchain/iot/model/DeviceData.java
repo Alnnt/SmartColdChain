@@ -67,14 +67,7 @@ public class DeviceData implements Serializable {
     private Double latitude;
 
     /**
-     * 电池电量（百分比）
-     */
-    @Field("battery")
-    private Integer battery;
-
-
-    /**
-     * 报警状态（0-正常，1-温度异常，2-湿度异常，3-设备离线，4-电量不足）
+     * 报警状态（0-正常，1-温度异常，2-湿度异常）
      */
     @Field("alarm_status")
     private Integer alarmStatus;

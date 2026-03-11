@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
  * Jackson 配置类
  * 处理 LocalDateTime/LocalDate/LocalTime 的序列化与反序列化
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Configuration
 public class JacksonConfig {

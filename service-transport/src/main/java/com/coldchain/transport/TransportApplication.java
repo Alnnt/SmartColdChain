@@ -9,7 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 /**
  * 运输服务启动类
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @SpringBootApplication
 @EnableDiscoveryClient

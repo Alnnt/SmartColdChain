@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * 实体基类
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 public abstract class BaseEntity implements Serializable {

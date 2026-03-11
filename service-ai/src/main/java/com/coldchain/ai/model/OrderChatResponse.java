@@ -8,7 +8,7 @@ import lombok.Data;
  * 订单解析响应
  * 从自然语言中提取的结构化订单信息
  *
- * @author coldchain
+ * @author Alnnt
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -11,7 +11,7 @@ import java.io.Serializable;
  * 统一响应结果封装类
  *
  * @param <T> 响应数据类型
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Builder

@@ -1,0 +1,147 @@
+server:
+  port: 8070
+
+spring:
+  application:
+    name: cold-chain-gateway
+
+  # 导入 Nacos 配置 (Spring Cloud Alibaba 2023.x 必需)
+  config:
+    import:
+      - optional:nacos:${spring.application.name}.yaml
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
+
+  cloud:
+    # Nacos配置
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: cold-chain
+        group: DEFAULT_GROUP
+    
+    # 网关配置
+    gateway:
+      # 开启服务发现路由
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      
+      # 路由配置
+      routes:
+        # 认证服务
+        - id: cold-chain-auth
+          uri: lb://cold-chain-auth
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=0
+        
+        # 用户服务
+        - id: service-user
+          uri: lb://service-user
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=0
+        
+        # 订单服务
+        - id: service-order
+          uri: lb://service-order
+          predicates:
+            - Path=/api/order/**
+          filters:
+            - StripPrefix=0
+        
+        # 库存服务
+        - id: service-inventory
+          uri: lb://service-inventory
+          predicates:
+            - Path=/api/inventory/**
+          filters:
+            - StripPrefix=0
+        
+        # 运输服务
+        - id: service-transport
+          uri: lb://service-transport
+          predicates:
+            - Path=/api/transport/**
+          filters:
+            - StripPrefix=0
+        
+        # IoT服务
+        - id: service-iot
+          uri: lb://service-iot
+          predicates:
+            - Path=/api/iot/**
+          filters:
+            - StripPrefix=0
+        
+        # AI服务
+        - id: service-ai
+          uri: lb://service-ai
+          predicates:
+            - Path=/api/ai/**
+          filters:
+            - StripPrefix=0
+      
+      # 默认过滤器
+      default-filters:
+        # 添加响应头
+        - AddResponseHeader=X-Gateway-Version, 1.0.0
+        # 重试配置
+        - name: Retry
+          args:
+            retries: 3
+            statuses: BAD_GATEWAY,SERVICE_UNAVAILABLE
+            methods: GET
+            backoff:
+              firstBackoff: 100ms
+              maxBackoff: 500ms
+              factor: 2
+  
+  # Redis配置（用于限流）
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 1
+      timeout: 3000ms
+
+# JWT配置（需与service-user保持一致）
+jwt:
+  secret: Y29sZGNoYWluLXNlY3JldC1rZXktbXVzdC1iZS1hdC1sZWFzdC0yNTYtYml0cy1sb25nLWZvci1qd3Q=
+  expiration: 86400
+
+# Sentinel配置
+alibaba:
+  sentinel:
+    transport:
+      dashboard: localhost:8858
+    eager: true
+    scg:
+      fallback:
+        mode: response
+        response-status: 429
+        response-body: '{"code":429,"message":"请求过于频繁，请稍后再试","data":null}'
+
+# 日志配置
+logging:
+  level:
+    root: info
+    com.coldchain.gateway: debug
+    org.springframework.cloud.gateway: debug
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n'
+
+# Actuator配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true

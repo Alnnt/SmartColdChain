@@ -14,10 +14,12 @@
 
     <!-- ==================== 子模块 ==================== -->
     <modules>
-        <module>common-model</module>
         <module>common-core</module>
-        <!-- <module>cold-chain-gateway</module> -->
-        <!-- <module>cold-chain-auth</module> -->
+        <module>common-model</module>
+        <module>common-auth</module>
+        <module>service-gateway</module>
+        <module>service-auth</module>
+        <module>service-user</module>
         <module>service-order</module>
         <module>service-inventory</module>
         <module>service-transport</module>
@@ -38,9 +40,6 @@
         <spring-boot.version>3.2.4</spring-boot.version>
         <spring-cloud.version>2023.0.1</spring-cloud.version>
         <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
-        <spring-ai.version>1.2.0</spring-ai.version>
-        <spring-ai-alibaba.version>1.1.0.0</spring-ai-alibaba.version>
-        <spring-ai-alibaba-extensions.version>1.1.2.0</spring-ai-alibaba-extensions.version>
 
         <!-- Database & ORM -->
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
@@ -136,6 +135,13 @@
                 <version>${rocketmq.version}</version>
             </dependency>
 
+            <!-- Common Auth Module -->
+            <dependency>
+                <groupId>com.coldchain</groupId>
+                <artifactId>common-auth</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Hutool Utility -->
             <dependency>
                 <groupId>cn.hutool</groupId>
@@ -160,18 +166,6 @@
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
-            </dependency>
-
-            <!-- Spring AI Alibaba -->
-            <dependency>
-                <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-                <version>${spring-ai-alibaba.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-agent-framework</artifactId>
-                <version>${spring-ai-alibaba-extensions.version}</version>
             </dependency>
 
             <!-- Internal Modules -->

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 /**
  * 库存实体
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Builder

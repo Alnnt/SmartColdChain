@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 /**
  * 库存服务降级处理
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @Component

@@ -1,9 +1,7 @@
 package com.coldchain.order.dto;
 
-import com.coldchain.common.entity.Address;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,20 +13,13 @@ import java.math.BigDecimal;
 /**
  * 创建订单请求 DTO
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderCreateDTO {
-
-    /**
-     * 用户ID
-     */
-    @NotNull(message = "用户ID不能为空")
-    private Long userId;
-
     /**
      * 商品ID
      */
@@ -50,8 +41,8 @@ public class OrderCreateDTO {
     private BigDecimal amount;
 
     /**
-     * 收货信息
+     * 收货地址ID
      */
-    @NotBlank(message = "收货信息不能为空")
-    private Address address;
+    @NotNull(message = "收货地址ID不能为空")
+    private Long addressId;
 }

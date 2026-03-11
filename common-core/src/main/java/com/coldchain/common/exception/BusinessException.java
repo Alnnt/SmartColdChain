@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 自定义业务异常
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Getter
 public class BusinessException extends RuntimeException {

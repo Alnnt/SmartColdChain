@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 /**
  * MyBatis Plus 配置类
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Configuration
 @ConditionalOnClass(MybatisPlusInterceptor.class)

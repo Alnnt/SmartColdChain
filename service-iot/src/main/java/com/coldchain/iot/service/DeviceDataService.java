@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 设备数据服务接口
  *
- * @author ColdChain
+ * @author Alnnt
  */
 public interface DeviceDataService {
 

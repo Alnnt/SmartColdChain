@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  * IoT 消息生产者
  * 将设备数据发送到 RocketMQ
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @Component

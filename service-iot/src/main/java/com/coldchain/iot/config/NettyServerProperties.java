@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 /**
  * Netty 服务器配置属性
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Component

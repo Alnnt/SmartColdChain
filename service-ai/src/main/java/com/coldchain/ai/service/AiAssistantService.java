@@ -7,7 +7,7 @@ import com.coldchain.ai.model.RiskAnalysisResponse;
 /**
  * AI助手服务接口
  *
- * @author coldchain
+ * @author Alnnt
  */
 public interface AiAssistantService {
 

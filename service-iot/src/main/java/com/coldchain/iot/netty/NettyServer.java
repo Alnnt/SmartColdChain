@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
  * Netty TCP 服务器
  * 用于接收IoT设备上报的数据
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @Component

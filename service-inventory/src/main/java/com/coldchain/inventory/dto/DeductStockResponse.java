@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 /**
  * 库存扣减响应DTO
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Builder

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * 运单响应 VO
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Builder

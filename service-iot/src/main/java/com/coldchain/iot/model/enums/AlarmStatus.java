@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 报警状态枚举
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Getter
 @AllArgsConstructor

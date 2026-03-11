@@ -5,7 +5,7 @@ import com.coldchain.inventory.dto.DeductStockResponse;
 /**
  * 库存服务接口
  *
- * @author ColdChain
+ * @author Alnnt
  */
 public interface InventoryService {
 

@@ -4,7 +4,10 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.coldchain.auth.common.util.RequestUtil;
 import com.coldchain.common.exception.BusinessException;
 import com.coldchain.common.result.Result;
 import com.coldchain.common.result.ResultCode;
@@ -23,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 /**
  * 订单服务实现
@@ -48,9 +53,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      */
     @Override
     @GlobalTransactional(name = "create-order-tx", rollbackFor = Exception.class)
-    public OrderVO createOrder(OrderCreateDTO dto) {
+    public OrderVO createOrder(OrderCreateDTO dto, Long userId) {
         log.info("开始创建订单: userId={}, productId={}, count={}",
-                dto.getUserId(), dto.getProductId(), dto.getProductCount());
+                userId, dto.getProductId(), dto.getProductCount());
 
         // 1. 生成订单编号
         String orderNo = generateOrderNo();
@@ -58,12 +63,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 2. 创建订单
         Order order = Order.builder()
                 .orderNo(orderNo)
-                .userId(dto.getUserId())
+                .userId(userId)
                 .productId(dto.getProductId())
                 .productCount(dto.getProductCount())
                 .amount(dto.getAmount())
                 .status(OrderStatus.PENDING_PAYMENT.getCode())
-                .address(dto.getAddress())
+                .addressId(dto.getAddressId())
                 .build();
 
         boolean saved = this.save(order);
@@ -84,7 +89,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         WaybillCreateDTO waybillDTO = WaybillCreateDTO.builder()
                 .orderId(order.getId())
                 .orderNo(orderNo)
-                .address(dto.getAddress())
+                .addressId(dto.getAddressId())
                 .productId(dto.getProductId())
                 .count(dto.getProductCount())
                 .build();
@@ -149,6 +154,63 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
 
         return updated;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean markOrderAsPaid(String orderNo, BigDecimal paidAmount) {
+        log.info("开始处理支付完成回调: orderNo={}, paidAmount={}", orderNo, paidAmount);
+
+        // 1. 查询订单
+        LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Order::getOrderNo, orderNo);
+        Order order = this.getOne(wrapper);
+
+        if (order == null) {
+            log.error("订单不存在: orderNo={}", orderNo);
+            throw new BusinessException(ResultCode.ORDER_NOT_FOUND, "订单不存在");
+        }
+
+        // 2. 检查订单状态（只有待支付状态才能更新为已支付）
+        if (!OrderStatus.PENDING_PAYMENT.getCode().equals(order.getStatus())) {
+            log.error("订单状态错误: orderNo={}, status={}", orderNo, order.getStatus());
+            throw new BusinessException(ResultCode.ORDER_STATUS_ERROR, "订单状态不是待支付");
+        }
+
+        // 3. 验证支付金额
+        if (paidAmount.compareTo(order.getAmount()) != 0) {
+            log.error("支付金额不匹配: orderNo={}, expectedAmount={}, paidAmount={}",
+                    orderNo, order.getAmount(), paidAmount);
+            throw new BusinessException(ResultCode.FAIL, "支付金额不匹配");
+        }
+
+        // 4. 更新订单状态为已支付
+        order.setStatus(OrderStatus.PAID.getCode());
+        boolean updated = this.updateById(order);
+
+        if (updated) {
+            log.info("订单支付状态更新成功: orderId={}, orderNo={}, status=PAID", order.getId(), orderNo);
+        } else {
+            log.error("订单支付状态更新失败: orderId={}, orderNo={}", order.getId(), orderNo);
+            throw new BusinessException(ResultCode.FAIL, "更新订单状态失败");
+        }
+
+        return true;
+    }
+
+    @Override
+    public IPage<OrderVO> listByUserId(Long userId, Integer page, Integer pageSize) {
+        log.info("查询用户订单列表: userId={}, page={}, pageSize={}", userId, page, pageSize);
+
+        LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Order::getUserId, userId)
+                .orderByDesc(Order::getCreateTime);
+
+        Page<Order> pageParam = new Page<>(page, pageSize);
+        IPage<Order> orderPage = this.page(pageParam, wrapper);
+
+        // 转换为 VO
+        return orderPage.convert(this::convertToVO);
     }
 
     /**

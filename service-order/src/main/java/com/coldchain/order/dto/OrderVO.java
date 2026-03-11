@@ -1,6 +1,5 @@
 package com.coldchain.order.dto;
 
-import com.coldchain.common.entity.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 /**
  * 订单响应 VO
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Builder
@@ -61,9 +60,9 @@ public class OrderVO {
     private String statusDesc;
 
     /**
-     * 收货地址
+     * 收货地址ID
      */
-    private Address address;
+    private Long addressId;
 
     /**
      * 运单ID

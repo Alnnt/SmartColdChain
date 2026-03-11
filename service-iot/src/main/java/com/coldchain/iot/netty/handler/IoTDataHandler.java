@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * IoT 数据处理器
  * 解析设备上报的JSON数据并发送到RocketMQ
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @Component

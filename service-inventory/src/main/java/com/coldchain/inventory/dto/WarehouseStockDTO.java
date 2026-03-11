@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 /**
  * 仓库库存信息DTO（用于智能调度计算）
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Builder

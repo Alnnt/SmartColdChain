@@ -2,7 +2,6 @@ package com.coldchain.order.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.coldchain.common.entity.Address;
 import com.coldchain.common.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +14,7 @@ import java.math.BigDecimal;
 /**
  * 订单实体
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Builder
@@ -68,10 +67,10 @@ public class Order extends BaseEntity {
     private Integer status;
 
     /**
-     * 收货地址
+     * 收货地址ID
      */
-    @TableField("address")
-    private Address address;
+    @TableField("address_id")
+    private Long addressId;
 
     /**
      * 运单ID

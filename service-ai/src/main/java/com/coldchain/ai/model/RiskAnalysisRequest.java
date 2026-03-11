@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 风险分析请求
  *
- * @author coldchain
+ * @author Alnnt
  */
 @Data
 @Schema(description = "运输风险分析请求")

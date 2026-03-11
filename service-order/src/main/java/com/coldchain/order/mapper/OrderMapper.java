@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * 订单 Mapper
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Mapper
 public interface OrderMapper extends BaseMapper<Order> {

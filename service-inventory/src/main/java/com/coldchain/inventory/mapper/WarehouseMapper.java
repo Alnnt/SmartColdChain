@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * 仓库Mapper接口
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Mapper
 public interface WarehouseMapper extends BaseMapper<Warehouse> {
