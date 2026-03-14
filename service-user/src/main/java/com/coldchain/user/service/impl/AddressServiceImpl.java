@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * 用户地址服务实现类
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @Service
@@ -72,7 +72,6 @@ public class AddressServiceImpl implements AddressService {
                 .longitude(request.getLongitude())
                 .latitude(request.getLatitude())
                 .isDefault(Boolean.TRUE.equals(request.getIsDefault()) ? 1 : 0)
-                .tag(request.getTag())
                 .build();
 
         addressMapper.insert(address);
@@ -106,8 +105,6 @@ public class AddressServiceImpl implements AddressService {
         address.setLongitude(request.getLongitude());
         address.setLatitude(request.getLatitude());
         address.setIsDefault(Boolean.TRUE.equals(request.getIsDefault()) ? 1 : 0);
-        address.setTag(request.getTag());
-
         addressMapper.updateById(address);
         log.info("用户地址更新成功: userId={}, addressId={}", userId, request.getId());
     }
@@ -145,9 +142,9 @@ public class AddressServiceImpl implements AddressService {
      * 转换为VO对象
      */
     private AddressDTO convertToVO(UserAddress address) {
-        String fullAddress = address.getProvince() + address.getCity() + 
-                             address.getDistrict() + address.getDetail();
-        
+        String fullAddress = address.getProvince() + address.getCity() +
+                address.getDistrict() + address.getDetail();
+
         return AddressDTO.builder()
                 .id(address.getId())
                 .contactName(address.getContactName())
@@ -160,7 +157,6 @@ public class AddressServiceImpl implements AddressService {
                 .longitude(address.getLongitude())
                 .latitude(address.getLatitude())
                 .isDefault(address.getIsDefault() == 1)
-                .tag(address.getTag())
                 .build();
     }
 }

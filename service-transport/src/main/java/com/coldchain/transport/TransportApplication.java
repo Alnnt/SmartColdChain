@@ -7,7 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
- * 运输服务启动类
+ * 杩愯緭鏈嶅姟鍚姩绫?
  *
  * @author Alnnt
  */

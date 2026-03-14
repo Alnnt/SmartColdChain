@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 设备数据 MongoDB Repository
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Repository
 public interface DeviceDataRepository extends MongoRepository<DeviceData, String> {

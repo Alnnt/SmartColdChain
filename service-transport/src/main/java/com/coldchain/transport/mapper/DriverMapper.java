@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Update;
 /**
  * 司机Mapper接口
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Mapper
 public interface DriverMapper extends BaseMapper<Driver> {

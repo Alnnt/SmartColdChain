@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * 用户地址控制器
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @RestController
@@ -30,7 +30,7 @@ public class AddressController {
 
     private final AddressService addressService;
     private final JwtTokenUtil jwtTokenUtil;
-//    private final RequestUtil requestUtil;
+    // private final RequestUtil requestUtil;
 
     @GetMapping("/list")
     @Operation(summary = "获取地址列表")
@@ -68,28 +68,28 @@ public class AddressController {
     }
 
     @PutMapping
-    @Operation(summary = "更新地址")
+    @Operation(summary = "鏇存柊鍦板潃")
     public Result<Void> update(@Valid @RequestBody AddressRequest addressRequest) {
         Long userId = RequestUtil.getUserId();
-        log.info("更新地址: userId={}, addressId={}", userId, addressRequest.getId());
+        log.info("鏇存柊鍦板潃: userId={}, addressId={}", userId, addressRequest.getId());
         addressService.update(userId, addressRequest);
         return Result.success();
     }
 
     @DeleteMapping("/{addressId}")
-    @Operation(summary = "删除地址")
-    public Result<Void> delete(@Parameter(description = "地址ID") @PathVariable Long addressId) {
+    @Operation(summary = "鍒犻櫎鍦板潃")
+    public Result<Void> delete(@Parameter(description = "鍦板潃ID") @PathVariable Long addressId) {
         Long userId = RequestUtil.getUserId();
-        log.info("删除地址: userId={}, addressId={}", userId, addressId);
+        log.info("鍒犻櫎鍦板潃: userId={}, addressId={}", userId, addressId);
         addressService.delete(userId, addressId);
         return Result.success();
     }
 
     @PutMapping("/{addressId}/default")
-    @Operation(summary = "设置默认地址")
-    public Result<Void> setDefault(@Parameter(description = "地址ID") @PathVariable Long addressId) {
+    @Operation(summary = "璁剧疆榛樿鍦板潃")
+    public Result<Void> setDefault(@Parameter(description = "鍦板潃ID") @PathVariable Long addressId) {
         Long userId = RequestUtil.getUserId();
-        log.info("设置默认地址: userId={}, addressId={}", userId, addressId);
+        log.info("璁剧疆榛樿鍦板潃: userId={}, addressId={}", userId, addressId);
         addressService.setDefault(userId, addressId);
         return Result.success();
     }

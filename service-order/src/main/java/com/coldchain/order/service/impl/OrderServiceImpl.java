@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.coldchain.auth.common.util.RequestUtil;
 import com.coldchain.common.exception.BusinessException;
 import com.coldchain.common.result.Result;
 import com.coldchain.common.result.ResultCode;
@@ -148,7 +147,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         boolean updated = this.updateById(order);
 
         if (updated) {
-            // 回滚库存
             inventoryClient.rollbackStock(order.getProductId(), order.getProductCount());
             log.info("订单取消成功，库存已回滚: orderId={}", orderId);
         }

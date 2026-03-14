@@ -16,9 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Netty 通道初始化器
+ * Netty 閫氶亾鍒濆鍖栧櫒
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Component
 @RequiredArgsConstructor
@@ -31,22 +31,21 @@ public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {
     protected void initChannel(SocketChannel channel) {
         ChannelPipeline pipeline = channel.pipeline();
 
-        // 空闲检测处理器
+        // 绌洪棽妫€娴嬪鐞嗗櫒
         pipeline.addLast("idleStateHandler", new IdleStateHandler(
                 properties.getReaderIdleTime(),
                 properties.getWriterIdleTime(),
                 properties.getAllIdleTime(),
-                TimeUnit.SECONDS
-        ));
+                TimeUnit.SECONDS));
 
-        // JSON对象解码器（自动分割JSON对象）
+        // JSON瀵硅薄瑙ｇ爜鍣紙鑷姩鍒嗗壊JSON瀵硅薄锛?
         pipeline.addLast("jsonDecoder", new JsonObjectDecoder(properties.getMaxFrameLength()));
 
-        // 字符串编解码器
+        // 瀛楃涓茬紪瑙ｇ爜鍣?
         pipeline.addLast("stringDecoder", new StringDecoder(StandardCharsets.UTF_8));
         pipeline.addLast("stringEncoder", new StringEncoder(StandardCharsets.UTF_8));
 
-        // IoT数据处理器
+        // IoT鏁版嵁澶勭悊鍣?
         pipeline.addLast("ioTDataHandler", ioTDataHandler);
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 库存Mapper接口
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Mapper
 public interface InventoryMapper extends BaseMapper<Inventory> {
@@ -43,7 +43,7 @@ public interface InventoryMapper extends BaseMapper<Inventory> {
               AND (i.total_stock - i.frozen_stock) >= #{count}
             """)
     List<WarehouseStockDTO> findWarehousesWithStock(@Param("productId") Long productId,
-                                                     @Param("count") Integer count);
+            @Param("count") Integer count);
 
     /**
      * 乐观锁扣减库存
@@ -62,7 +62,7 @@ public interface InventoryMapper extends BaseMapper<Inventory> {
               AND total_stock >= #{count}
             """)
     int deductStockWithOptimisticLock(@Param("inventoryId") Long inventoryId,
-                                       @Param("count") Integer count);
+            @Param("count") Integer count);
 
     /**
      * 冻结库存（预扣库存，用于分布式事务的Try阶段）
@@ -80,7 +80,7 @@ public interface InventoryMapper extends BaseMapper<Inventory> {
               AND (total_stock - frozen_stock) >= #{count}
             """)
     int freezeStock(@Param("inventoryId") Long inventoryId,
-                    @Param("count") Integer count);
+            @Param("count") Integer count);
 
     /**
      * 释放冻结库存（用于分布式事务的Cancel阶段）
@@ -98,7 +98,7 @@ public interface InventoryMapper extends BaseMapper<Inventory> {
               AND frozen_stock >= #{count}
             """)
     int unfreezeStock(@Param("inventoryId") Long inventoryId,
-                      @Param("count") Integer count);
+            @Param("count") Integer count);
 
     /**
      * 确认扣减库存（用于分布式事务的Confirm阶段）
@@ -119,5 +119,5 @@ public interface InventoryMapper extends BaseMapper<Inventory> {
               AND frozen_stock >= #{count}
             """)
     int confirmDeductStock(@Param("inventoryId") Long inventoryId,
-                           @Param("count") Integer count);
+            @Param("count") Integer count);
 }

@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * 运输控制器
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @RestController
@@ -29,9 +29,6 @@ public class TransportController {
 
     private final TransportService transportService;
 
-    /**
-     * 创建运单
-     */
     @PostMapping("/waybill/create")
     @Operation(summary = "创建运单", description = "根据订单ID创建运单，自动分配空闲司机")
     public Result<TransportOrder> createWaybill(@Valid @RequestBody CreateWaybillRequest request) {
@@ -41,8 +38,7 @@ public class TransportController {
             TransportOrder transportOrder = transportService.createWaybill(
                     request.getOrderId(),
                     request.getFromAddress(),
-                    request.getToAddress()
-            );
+                    request.getToAddress());
             log.info("运单创建成功: {}", transportOrder.getId());
             return Result.success("运单创建成功", transportOrder);
         } catch (RuntimeException e) {
@@ -51,9 +47,6 @@ public class TransportController {
         }
     }
 
-    /**
-     * 根据订单ID查询运单
-     */
     @GetMapping("/waybill/order/{orderId}")
     @Operation(summary = "根据订单ID查询运单", description = "根据订单ID查询关联的运单信息")
     public Result<TransportOrder> getByOrderId(
@@ -65,14 +58,11 @@ public class TransportController {
         return Result.success(transportOrder);
     }
 
-    /**
-     * 开始运输
-     */
     @PostMapping("/waybill/{transportOrderId}/start")
     @Operation(summary = "开始运输", description = "司机取货后调用，将运单状态更新为运输中")
     public Result<Boolean> startTransport(
             @Parameter(description = "运单ID") @PathVariable Long transportOrderId) {
-        log.info("开始运输请求, transportOrderId={}", transportOrderId);
+        log.info("开始运输请求: transportOrderId={}", transportOrderId);
 
         boolean success = transportService.startTransport(transportOrderId);
         if (success) {
@@ -82,9 +72,6 @@ public class TransportController {
         }
     }
 
-    /**
-     * 完成运输
-     */
     @PostMapping("/waybill/{transportOrderId}/complete")
     @Operation(summary = "完成运输", description = "司机送达后调用，将运单状态更新为已送达")
     public Result<Boolean> completeTransport(
@@ -99,9 +86,6 @@ public class TransportController {
         }
     }
 
-    /**
-     * 取消运单
-     */
     @PostMapping("/waybill/{transportOrderId}/cancel")
     @Operation(summary = "取消运单", description = "取消待取货状态的运单")
     public Result<Boolean> cancelTransport(
@@ -116,9 +100,6 @@ public class TransportController {
         }
     }
 
-    /**
-     * 查询司机的进行中运单
-     */
     @GetMapping("/waybill/driver/{driverId}/active")
     @Operation(summary = "查询司机的进行中运单", description = "根据司机ID查询所有进行中的运单")
     public Result<List<TransportOrder>> getActiveTransportsByDriver(
@@ -127,9 +108,6 @@ public class TransportController {
         return Result.success(orders);
     }
 
-    /**
-     * 获取所有空闲司机
-     */
     @GetMapping("/driver/available")
     @Operation(summary = "获取空闲司机列表", description = "查询所有状态为空闲的司机")
     public Result<List<Driver>> getAvailableDrivers() {
@@ -137,9 +115,6 @@ public class TransportController {
         return Result.success(drivers);
     }
 
-    /**
-     * 更新司机位置
-     */
     @PostMapping("/driver/{driverId}/location")
     @Operation(summary = "更新司机位置", description = "更新司机的GPS位置信息")
     public Result<Boolean> updateDriverLocation(

@@ -9,13 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 /**
  * 库存服务 Feign 客户端
  *
- * @author ColdChain
+ * @author Alnnt
  */
-@FeignClient(
-        name = "service-inventory",
-        contextId = "inventoryClient",
-        fallbackFactory = InventoryClientFallback.class
-)
+@FeignClient(name = "service-inventory", contextId = "inventoryClient", fallbackFactory = InventoryClientFallback.class)
 public interface InventoryClient {
 
     /**

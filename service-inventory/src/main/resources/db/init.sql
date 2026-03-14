@@ -45,8 +45,7 @@ CREATE TABLE t_inventory (
     PRIMARY KEY (id),
     UNIQUE INDEX uk_product_warehouse (product_id, warehouse_id),
     INDEX idx_product_id (product_id),
-    INDEX idx_warehouse_id (warehouse_id),
-    CONSTRAINT fk_inventory_warehouse FOREIGN KEY (warehouse_id) REFERENCES t_warehouse(id)
+    INDEX idx_warehouse_id (warehouse_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='库存表';
 
 -- =====================================================

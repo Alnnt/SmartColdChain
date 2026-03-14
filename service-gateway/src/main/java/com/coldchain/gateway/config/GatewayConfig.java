@@ -3,6 +3,7 @@ package com.coldchain.gateway.config;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import reactor.core.publisher.Mono;
 
 /**
@@ -17,6 +18,7 @@ public class GatewayConfig {
      * 基于IP的限流键解析器
      */
     @Bean
+    @Primary
     public KeyResolver ipKeyResolver() {
         return exchange -> {
             String ip = exchange.getRequest().getRemoteAddress() != null

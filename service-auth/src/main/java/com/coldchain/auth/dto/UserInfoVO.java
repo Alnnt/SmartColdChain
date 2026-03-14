@@ -26,8 +26,8 @@ public class UserInfoVO {
     @Schema(description = "用户名")
     private String username;
 
-    @Schema(description = "真实姓名")
-    private String realName;
+    @Schema(description = "昵称")
+    private String nickname;
 
     @Schema(description = "手机号")
     private String phone;
@@ -37,12 +37,6 @@ public class UserInfoVO {
 
     @Schema(description = "头像")
     private String avatar;
-
-    @Schema(description = "部门ID")
-    private Long deptId;
-
-    @Schema(description = "部门名称")
-    private String deptName;
 
     @Schema(description = "角色列表")
     private List<String> roles;

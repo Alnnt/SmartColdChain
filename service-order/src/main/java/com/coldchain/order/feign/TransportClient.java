@@ -11,13 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 /**
  * 运输服务 Feign 客户端
  *
- * @author ColdChain
+ * @author Alnnt
  */
-@FeignClient(
-        name = "service-transport",
-        contextId = "transportClient",
-        fallbackFactory = TransportClientFallback.class
-)
+@FeignClient(name = "service-transport", contextId = "transportClient", fallbackFactory = TransportClientFallback.class)
 public interface TransportClient {
 
     /**

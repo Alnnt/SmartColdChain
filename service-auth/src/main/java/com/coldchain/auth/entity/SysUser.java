@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * 系统用户实体（管理后台用户）
+ * 鐢ㄦ埛瀹炰綋锛堟槧灏勭粺涓€鐢ㄦ埛琛?t_user锛?
  *
  * @author Alnnt
  */
@@ -17,77 +17,40 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("sys_user")
+@TableName("t_user")
 public class SysUser {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 用户名
-     */
     private String username;
 
-    /**
-     * 密码（BCrypt加密）
-     */
     private String password;
 
-    /**
-     * 真实姓名
-     */
-    private String realName;
+    private String nickname;
 
-    /**
-     * 手机号
-     */
     private String phone;
 
-    /**
-     * 邮箱
-     */
     private String email;
 
-    /**
-     * 头像URL
-     */
     private String avatar;
 
     /**
-     * 部门ID
+     * 鐢ㄦ埛绫诲瀷锛?-鏅€氱敤鎴凤紝1-绯荤粺绠＄悊鍛橈級
      */
-    private Long deptId;
+    private Integer userType;
 
     /**
-     * 状态（0-禁用，1-正常）
+     * 鐘舵€侊紙0-绂佺敤锛?-姝ｅ父锛?
      */
     private Integer status;
 
-    /**
-     * 最后登录时间
-     */
-    private LocalDateTime lastLoginTime;
-
-    /**
-     * 最后登录IP
-     */
-    private String lastLoginIp;
-
-    /**
-     * 创建时间
-     */
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
-    /**
-     * 逻辑删除
-     */
     @TableLogic
     private Integer deleted;
 }

@@ -11,9 +11,9 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  * 1. Spring Boot Web 服务（端口 8084）
  * 2. Netty TCP 服务器（端口 9000）
  *
- * @author ColdChain
+ * @author Alnnt
  */
-@SpringBootApplication(scanBasePackages = {"com.coldchain.iot", "com.coldchain.common"})
+@SpringBootApplication(scanBasePackages = { "com.coldchain.iot", "com.coldchain.common" })
 @EnableDiscoveryClient
 public class IoTApplication {
 

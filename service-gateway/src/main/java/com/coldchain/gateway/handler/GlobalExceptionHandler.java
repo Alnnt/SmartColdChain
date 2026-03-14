@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 全局异常处理器
+ * 网关全局异常处理
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @Order(-1)
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
         ServerHttpResponse response = exchange.getResponse();
-        
+
         if (response.isCommitted()) {
             return Mono.error(ex);
         }
@@ -44,10 +44,8 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
         String path = exchange.getRequest().getURI().getPath();
         log.error("网关异常: {} - {}", path, ex.getMessage(), ex);
 
-        // 设置响应头
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        // 根据异常类型确定状态码和消息
         int code;
         String message;
 

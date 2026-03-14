@@ -2,8 +2,7 @@ package com.coldchain.auth.common.util;
 
 import com.coldchain.auth.common.AuthConstants;
 import com.coldchain.auth.common.JwtTokenUtil;
-import jakarta.annotation.PostConstruct;import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.context.annotation.Configuration;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -11,13 +10,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 /**
  * 请求工具类
  */
-@Configuration
 public class RequestUtil {
 
     private static JwtTokenUtil jwtTokenUtil;
 
-    @PostConstruct
-    public void init(JwtTokenUtil jwtTokenUtil) {
+    public RequestUtil(JwtTokenUtil jwtTokenUtil) {
         RequestUtil.jwtTokenUtil = jwtTokenUtil;
     }
 

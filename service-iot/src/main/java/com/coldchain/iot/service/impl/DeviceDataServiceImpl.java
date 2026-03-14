@@ -22,9 +22,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 设备数据服务实现
+ * 璁惧鏁版嵁鏈嶅姟瀹炵幇
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @Service
@@ -37,27 +37,27 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     private final IoTConfig ioTConfig;
 
     /**
-     * 设备状态缓存前缀
+     * 璁惧鐘舵€佺紦瀛樺墠缂€
      */
     private static final String DEVICE_STATUS_PREFIX = "iot:device:status:";
 
     /**
-     * 设备状态缓存过期时间（分钟）
+     * 璁惧鐘舵€佺紦瀛樿繃鏈熸椂闂达紙鍒嗛挓锛?
      */
     private static final long DEVICE_STATUS_EXPIRE = 5;
 
     @Override
     public void processDeviceData(DeviceMessage message) {
-        // 1. 转换为存储实体
+        // 1. 杞崲涓哄瓨鍌ㄥ疄浣?
         DeviceData deviceData = convertToDeviceData(message);
 
-        // 3. 存储到 MongoDB
+        // 3. 瀛樺偍鍒?MongoDB
         deviceDataRepository.save(deviceData);
 
-        // 4. 更新设备状态缓存
+        // 4. 鏇存柊璁惧鐘舵€佺紦瀛?
         updateDeviceStatusCache(message.getDeviceId());
 
-        // 5. 发送到 RocketMQ
+        // 5. 鍙戦€佸埌 RocketMQ
         messageProducer.sendDeviceData(deviceData);
     }
 
@@ -91,7 +91,7 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     }
 
     /**
-     * 转换为存储实体
+     * 杞崲涓哄瓨鍌ㄥ疄浣?
      */
     private DeviceData convertToDeviceData(DeviceMessage message) {
         DeviceData.DeviceDataBuilder builder = DeviceData.builder()
@@ -101,18 +101,17 @@ public class DeviceDataServiceImpl implements DeviceDataService {
                 .waybillId(message.getWaybillId())
                 .timestamp(LocalDateTime.now());
 
-        // GPS坐标
+        // GPS鍧愭爣
         if (message.getGps() != null) {
             builder.longitude(message.getGps().getLongitude());
             builder.latitude(message.getGps().getLatitude());
         }
 
-        // 设备端时间戳转换
+        // 璁惧绔椂闂存埑杞崲
         if (message.getTimestamp() != null) {
             builder.timestamp(LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(message.getTimestamp()),
-                    ZoneId.systemDefault()
-            ));
+                    ZoneId.systemDefault()));
         } else {
             builder.timestamp(LocalDateTime.now());
         }
@@ -121,10 +120,10 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     }
 
     /**
-     * 检测报警状态
+     * 妫€娴嬫姤璀︾姸鎬?
      */
     private Integer checkAlarmStatus(DeviceData data) {
-        // 温度异常检测
+        // 娓╁害寮傚父妫€娴?
         if (data.getTemperature() != null) {
             if (data.getTemperature() < ioTConfig.getTemperatureMin() ||
                     data.getTemperature() > ioTConfig.getTemperatureMax()) {
@@ -132,7 +131,7 @@ public class DeviceDataServiceImpl implements DeviceDataService {
             }
         }
 
-        // 湿度异常检测
+        // 婀垮害寮傚父妫€娴?
         if (data.getHumidity() != null) {
             if (data.getHumidity() < ioTConfig.getHumidityMin() ||
                     data.getHumidity() > ioTConfig.getHumidityMax()) {
@@ -144,7 +143,7 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     }
 
     /**
-     * 更新设备状态缓存
+     * 鏇存柊璁惧鐘舵€佺紦瀛?
      */
     private void updateDeviceStatusCache(String deviceId) {
         String key = DEVICE_STATUS_PREFIX + deviceId;
@@ -153,7 +152,7 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     }
 
     /**
-     * 检查设备是否在线
+     * 妫€鏌ヨ澶囨槸鍚﹀湪绾?
      */
     public boolean isDeviceOnline(String deviceId) {
         String key = DEVICE_STATUS_PREFIX + deviceId;

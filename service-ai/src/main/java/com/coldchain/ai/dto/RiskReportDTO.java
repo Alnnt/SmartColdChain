@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * 冷链风险分析报告
+ * 鍐烽摼椋庨櫓鍒嗘瀽鎶ュ憡
  */
 @Data
 @Builder
@@ -19,39 +19,39 @@ import java.util.List;
 public class RiskReportDTO {
 
     /**
-     * 整体风险等级
-     * 取值范围: "LOW", "MEDIUM", "HIGH", "CRITICAL"
+     * 鏁翠綋椋庨櫓绛夌骇
+     * 鍙栧€艰寖鍥? "LOW", "MEDIUM", "HIGH", "CRITICAL"
      */
     private RiskLevel riskLevel;
 
     /**
-     * 风险评分 (0-100)
+     * 椋庨櫓璇勫垎 (0-100)
      */
     private Integer riskScore;
 
     /**
-     * 风险评估简述
+     * 椋庨櫓璇勪及绠€杩?
      */
     private String summary;
 
     /**
-     * 温度模式分析
+     * 娓╁害妯″紡鍒嗘瀽
      */
     private String temperatureAnalysis;
 
     /**
-     * 建议采取的措施
+     * 寤鸿閲囧彇鐨勬帾鏂?
      */
     private List<String> recommendations;
 
     /**
-     * 识别出的潜在问题
+     * 璇嗗埆鍑虹殑娼滃湪闂
      */
     private List<String> potentialIssues;
 
     /**
-     * 预估货物状况
-     * 取值范围: "OPTIMAL", "ACCEPTABLE", "COMPROMISED", "DAMAGED"
+     * 棰勪及璐х墿鐘跺喌
+     * 鍙栧€艰寖鍥? "OPTIMAL", "ACCEPTABLE", "COMPROMISED", "DAMAGED"
      */
     private CargoCondition estimatedCargoCondition;
 }

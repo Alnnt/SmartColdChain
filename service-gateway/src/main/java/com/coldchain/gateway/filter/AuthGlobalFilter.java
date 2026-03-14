@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * 全局认证过滤器
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @Component
@@ -46,11 +46,10 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     private static final List<String> WHITE_LIST = Arrays.asList(
             // 认证服务
             "/api/auth/login",
+            "/api/auth/user/login",
+            "/api/auth/register",
             "/api/auth/refresh",
-            // 用户服务
-            "/api/user/register",
-            "/api/user/login",
-            // API文档
+            // API鏂囨。
             "/*/doc.html",
             "/*/v3/api-docs/**",
             "/*/swagger-ui/**",

@@ -14,9 +14,9 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 设备数据实体（MongoDB文档）
+ * 璁惧鏁版嵁瀹炰綋锛圡ongoDB鏂囨。锛?
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Data
 @Builder
@@ -29,57 +29,56 @@ public class DeviceData implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * MongoDB 文档ID
+     * MongoDB 鏂囨。ID
      */
     @Id
     private String id;
 
     /**
-     * 设备ID
+     * 璁惧ID
      */
     @Indexed
     @Field("device_id")
     private String deviceId;
 
-
     /**
-     * 温度（摄氏度）
+     * 娓╁害锛堟憚姘忓害锛?
      */
     @Field("temperature")
     private Double temperature;
 
     /**
-     * 湿度（百分比）
+     * 婀垮害锛堢櫨鍒嗘瘮锛?
      */
     @Field("humidity")
     private Double humidity;
 
     /**
-     * GPS经度
+     * GPS缁忓害
      */
     @Field("longitude")
     private Double longitude;
 
     /**
-     * GPS纬度
+     * GPS绾害
      */
     @Field("latitude")
     private Double latitude;
 
     /**
-     * 报警状态（0-正常，1-温度异常，2-湿度异常）
+     * 鎶ヨ鐘舵€侊紙0-姝ｅ父锛?-娓╁害寮傚父锛?-婀垮害寮傚父锛?
      */
     @Field("alarm_status")
     private Integer alarmStatus;
 
     /**
-     * 运单ID（关联的运输任务）
+     * 杩愬崟ID锛堝叧鑱旂殑杩愯緭浠诲姟锛?
      */
     @Field("waybill_id")
     private Long waybillId;
 
     /**
-     * 数据采集时间（设备上报时间）
+     * 鏁版嵁閲囬泦鏃堕棿锛堣澶囦笂鎶ユ椂闂达級
      */
     @Indexed
     @Field("timestamp")

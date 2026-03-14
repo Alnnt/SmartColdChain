@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  * AI助手控制器
  * 提供订单智能解析和运输风险分析功能
  *
- * @author coldchain
+ * @author Alnnt
  */
 @Slf4j
 @RestController

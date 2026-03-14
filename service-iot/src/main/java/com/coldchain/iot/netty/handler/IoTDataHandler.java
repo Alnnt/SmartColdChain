@@ -18,8 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * IoT 数据处理器
- * 解析设备上报的JSON数据并发送到RocketMQ
+ * IoT 鏁版嵁澶勭悊鍣?
+ * 瑙ｆ瀽璁惧涓婃姤鐨凧SON鏁版嵁骞跺彂閫佸埌RocketMQ
  *
  * @author Alnnt
  */
@@ -33,27 +33,27 @@ public class IoTDataHandler extends SimpleChannelInboundHandler<String> {
     private final DeviceDataService deviceDataService;
 
     /**
-     * 设备连接映射表（deviceId -> ChannelHandlerContext）
+     * 璁惧杩炴帴鏄犲皠琛紙deviceId -> ChannelHandlerContext锛?
      */
     private static final ConcurrentHashMap<String, ChannelHandlerContext> DEVICE_CHANNELS = new ConcurrentHashMap<>();
 
     /**
-     * 消息计数器
+     * 娑堟伅璁℃暟鍣?
      */
     private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
-        log.info("设备连接: {}:{}", address.getHostString(), address.getPort());
+        log.info("璁惧杩炴帴: {}:{}", address.getHostString(), address.getPort());
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
-        log.info("设备断开连接: {}:{}", address.getHostString(), address.getPort());
+        log.info("璁惧鏂紑杩炴帴: {}:{}", address.getHostString(), address.getPort());
 
-        // 移除设备通道映射
+        // 绉婚櫎璁惧閫氶亾鏄犲皠
         DEVICE_CHANNELS.entrySet().removeIf(entry -> entry.getValue().equals(ctx));
     }
 
@@ -65,36 +65,36 @@ public class IoTDataHandler extends SimpleChannelInboundHandler<String> {
 
         long count = MESSAGE_COUNTER.incrementAndGet();
         if (count % 1000 == 0) {
-            log.info("已处理消息数: {}", count);
+            log.info("宸插鐞嗘秷鎭暟: {}", count);
         }
 
         try {
-            // 解析JSON消息
+            // 瑙ｆ瀽JSON娑堟伅
             DeviceMessage deviceMessage = objectMapper.readValue(msg, DeviceMessage.class);
 
             if (StrUtil.isBlank(deviceMessage.getDeviceId())) {
-                log.warn("设备ID为空，丢弃消息: {}", msg);
+                log.warn("璁惧ID涓虹┖锛屼涪寮冩秷鎭? {}", msg);
                 sendResponse(ctx, buildErrorResponse("INVALID_DEVICE_ID"));
                 return;
             }
 
-            // 注册设备通道
+            // 娉ㄥ唽璁惧閫氶亾
             DEVICE_CHANNELS.put(deviceMessage.getDeviceId(), ctx);
 
-            log.debug("收到设备数据: deviceId={}, temperature={}, humidity={}, gps={}",
+            log.debug("鏀跺埌璁惧鏁版嵁: deviceId={}, temperature={}, humidity={}, gps={}",
                     deviceMessage.getDeviceId(),
                     deviceMessage.getTemperature(),
                     deviceMessage.getHumidity(),
                     deviceMessage.getGps());
 
-            // 处理设备数据（存储 + 发送MQ）
+            // 澶勭悊璁惧鏁版嵁锛堝瓨鍌?+ 鍙戦€丮Q锛?
             deviceDataService.processDeviceData(deviceMessage);
 
-            // 发送确认响应
+            // 鍙戦€佺‘璁ゅ搷搴?
             sendResponse(ctx, buildSuccessResponse(deviceMessage.getDeviceId()));
 
         } catch (Exception e) {
-            log.error("解析设备数据失败: {}", msg, e);
+            log.error("瑙ｆ瀽璁惧鏁版嵁澶辫触: {}", msg, e);
             sendResponse(ctx, buildErrorResponse("PARSE_ERROR"));
         }
     }
@@ -103,7 +103,7 @@ public class IoTDataHandler extends SimpleChannelInboundHandler<String> {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
         if (evt instanceof IdleStateEvent idleEvent) {
             if (idleEvent.state() == IdleState.READER_IDLE) {
-                log.warn("设备读空闲超时，关闭连接: {}", ctx.channel().remoteAddress());
+                log.warn("璁惧璇荤┖闂茶秴鏃讹紝鍏抽棴杩炴帴: {}", ctx.channel().remoteAddress());
                 ctx.close();
             }
         }
@@ -111,12 +111,12 @@ public class IoTDataHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        log.error("通道异常: {}", ctx.channel().remoteAddress(), cause);
+        log.error("閫氶亾寮傚父: {}", ctx.channel().remoteAddress(), cause);
         ctx.close();
     }
 
     /**
-     * 发送响应
+     * 鍙戦€佸搷搴?
      */
     private void sendResponse(ChannelHandlerContext ctx, String response) {
         if (ctx.channel().isActive()) {
@@ -125,7 +125,7 @@ public class IoTDataHandler extends SimpleChannelInboundHandler<String> {
     }
 
     /**
-     * 构建成功响应
+     * 鏋勫缓鎴愬姛鍝嶅簲
      */
     private String buildSuccessResponse(String deviceId) {
         return String.format("{\"code\":200,\"deviceId\":\"%s\",\"msg\":\"OK\",\"timestamp\":%d}",
@@ -133,7 +133,7 @@ public class IoTDataHandler extends SimpleChannelInboundHandler<String> {
     }
 
     /**
-     * 构建错误响应
+     * 鏋勫缓閿欒鍝嶅簲
      */
     private String buildErrorResponse(String error) {
         return String.format("{\"code\":400,\"msg\":\"%s\",\"timestamp\":%d}",
@@ -141,7 +141,7 @@ public class IoTDataHandler extends SimpleChannelInboundHandler<String> {
     }
 
     /**
-     * 向指定设备发送消息
+     * 鍚戞寚瀹氳澶囧彂閫佹秷鎭?
      */
     public boolean sendToDevice(String deviceId, String message) {
         ChannelHandlerContext ctx = DEVICE_CHANNELS.get(deviceId);
@@ -153,14 +153,14 @@ public class IoTDataHandler extends SimpleChannelInboundHandler<String> {
     }
 
     /**
-     * 获取在线设备数量
+     * 鑾峰彇鍦ㄧ嚎璁惧鏁伴噺
      */
     public int getOnlineDeviceCount() {
         return DEVICE_CHANNELS.size();
     }
 
     /**
-     * 获取消息处理总数
+     * 鑾峰彇娑堟伅澶勭悊鎬绘暟
      */
     public long getMessageCount() {
         return MESSAGE_COUNTER.get();

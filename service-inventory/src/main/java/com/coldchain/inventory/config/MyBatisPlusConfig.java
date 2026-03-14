@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import java.time.LocalDateTime;
 
 /**
- * MyBatis Plus 配置类
+ * MyBatis Plus 閰嶇疆绫?
  *
  * @author Alnnt
  */
@@ -20,23 +20,23 @@ import java.time.LocalDateTime;
 public class MyBatisPlusConfig implements MetaObjectHandler {
 
     /**
-     * 配置 MyBatis Plus 拦截器
+     * 閰嶇疆 MyBatis Plus 鎷︽埅鍣?
      */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
 
-        // 分页插件
+        // 鍒嗛〉鎻掍欢
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
 
-        // 乐观锁插件
+        // 涔愯閿佹彃浠?
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
 
         return interceptor;
     }
 
     /**
-     * 插入时自动填充
+     * 鎻掑叆鏃惰嚜鍔ㄥ～鍏?
      */
     @Override
     public void insertFill(MetaObject metaObject) {
@@ -47,7 +47,7 @@ public class MyBatisPlusConfig implements MetaObjectHandler {
     }
 
     /**
-     * 更新时自动填充
+     * 鏇存柊鏃惰嚜鍔ㄥ～鍏?
      */
     @Override
     public void updateFill(MetaObject metaObject) {

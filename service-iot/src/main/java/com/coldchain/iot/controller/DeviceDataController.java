@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * 设备数据控制器
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Tag(name = "设备数据", description = "IoT设备数据查询接口")
 @RestController

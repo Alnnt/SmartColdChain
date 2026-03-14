@@ -18,10 +18,17 @@ public interface AuthService {
     LoginResponse login(LoginRequest request);
 
     /**
-     * 刷新Token
-     *
-     * @param request 刷新请求
-     * @return Token响应
+     * 鏅€氱敤鎴风櫥褰?
+     */
+    UserLoginResponse userLogin(LoginRequest request);
+
+    /**
+     * 鏅€氱敤鎴锋敞鍐?
+     */
+    UserLoginResponse register(RegisterRequest request);
+
+    /**
+     * 鍒锋柊Token
      */
     TokenResponse refreshToken(RefreshTokenRequest request);
 
@@ -35,16 +42,12 @@ public interface AuthService {
 
     /**
      * 登出
-     *
-     * @param token 访问Token
      */
     void logout(String token);
 
     /**
      * 验证Token
      *
-     * @param token 访问Token
-     * @return 是否有效
      */
     boolean validateToken(String token);
 }

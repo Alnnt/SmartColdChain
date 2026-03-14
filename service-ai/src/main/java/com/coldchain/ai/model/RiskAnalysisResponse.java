@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 风险分析响应
  *
- * @author coldchain
+ * @author Alnnt
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

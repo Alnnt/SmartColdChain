@@ -1,14 +1,13 @@
 package com.coldchain.auth.common.config;
 
 import com.coldchain.auth.common.JwtTokenUtil;
-import com.coldchain.auth.common.util.RequestUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * 认证模块自动配置
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Configuration
 public class AuthAutoConfiguration {
@@ -18,6 +17,8 @@ public class AuthAutoConfiguration {
         return new JwtTokenUtil();
     }
 
-    @Bean
-    public RequestUtil requestUtil() { return new RequestUtil(); }
+//    @Bean
+//    public RequestUtil requestUtil(JwtTokenUtil jwtTokenUtil) {
+//        return new RequestUtil(jwtTokenUtil);
+//    }
 }

@@ -52,8 +52,7 @@ CREATE TABLE t_transport_order (
     INDEX idx_order_id (order_id),
     INDEX idx_driver_id (driver_id),
     INDEX idx_status (status),
-    INDEX idx_create_time (create_time),
-    CONSTRAINT fk_transport_driver FOREIGN KEY (driver_id) REFERENCES t_driver(id)
+    INDEX idx_create_time (create_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='运单表';
 
 -- =====================================================

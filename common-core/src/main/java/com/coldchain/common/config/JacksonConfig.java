@@ -20,8 +20,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Jackson 配置类
- * 处理 LocalDateTime/LocalDate/LocalTime 的序列化与反序列化
+ * Jackson 閰嶇疆绫?
+ * 澶勭悊 LocalDateTime/LocalDate/LocalTime 鐨勫簭鍒楀寲涓庡弽搴忓垪鍖?
  *
  * @author Alnnt
  */
@@ -29,17 +29,17 @@ import java.time.format.DateTimeFormatter;
 public class JacksonConfig {
 
     /**
-     * 日期时间格式
+     * 鏃ユ湡鏃堕棿鏍煎紡
      */
     public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     /**
-     * 日期格式
+     * 鏃ユ湡鏍煎紡
      */
     public static final String DATE_PATTERN = "yyyy-MM-dd";
 
     /**
-     * 时间格式
+     * 鏃堕棿鏍煎紡
      */
     public static final String TIME_PATTERN = "HH:mm:ss";
 
@@ -49,34 +49,34 @@ public class JacksonConfig {
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // 创建 JavaTimeModule 用于处理 Java 8 日期时间类型
+        // 鍒涘缓 JavaTimeModule 鐢ㄤ簬澶勭悊 Java 8 鏃ユ湡鏃堕棿绫诲瀷
         JavaTimeModule javaTimeModule = new JavaTimeModule();
 
-        // LocalDateTime 序列化器和反序列化器
+        // LocalDateTime 搴忓垪鍖栧櫒鍜屽弽搴忓垪鍖栧櫒
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
         javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(dateTimeFormatter));
         javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(dateTimeFormatter));
 
-        // LocalDate 序列化器和反序列化器
+        // LocalDate 搴忓垪鍖栧櫒鍜屽弽搴忓垪鍖栧櫒
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
         javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(dateFormatter));
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(dateFormatter));
 
-        // LocalTime 序列化器和反序列化器
+        // LocalTime 搴忓垪鍖栧櫒鍜屽弽搴忓垪鍖栧櫒
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(TIME_PATTERN);
         javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(timeFormatter));
         javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(timeFormatter));
 
-        // 注册模块
+        // 娉ㄥ唽妯″潡
         objectMapper.registerModule(javaTimeModule);
 
-        // 禁用将日期写为时间戳的功能
+        // 绂佺敤灏嗘棩鏈熷啓涓烘椂闂存埑鐨勫姛鑳?
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        // 禁用遇到未知属性时抛出异常
+        // 绂佺敤閬囧埌鏈煡灞炴€ф椂鎶涘嚭寮傚父
         objectMapper.disable(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-        // 禁用空对象序列化时抛出异常
+        // 绂佺敤绌哄璞″簭鍒楀寲鏃舵姏鍑哄紓甯?
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
         return objectMapper;

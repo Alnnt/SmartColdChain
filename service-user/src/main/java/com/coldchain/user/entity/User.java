@@ -10,8 +10,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 /**
  * 用户实体
  *
@@ -26,52 +24,35 @@ import java.time.LocalDateTime;
 @Schema(description = "用户实体")
 public class User extends BaseEntity {
 
-    /**
-     * 用户名
-     */
     @Schema(description = "用户名")
     @TableField("username")
     private String username;
 
-    /**
-     * 密码（加密存储）
-     */
     @Schema(description = "密码")
     @TableField("password")
     private String password;
 
-    /**
-     * 昵称
-     */
     @Schema(description = "昵称")
     @TableField("nickname")
     private String nickname;
 
-    /**
-     * 手机号
-     */
     @Schema(description = "手机号")
     @TableField("phone")
     private String phone;
 
-    /**
-     * 邮箱
-     */
     @Schema(description = "邮箱")
     @TableField("email")
     private String email;
 
-    /**
-     * 头像URL
-     */
     @Schema(description = "头像URL")
     @TableField("avatar")
     private String avatar;
 
-    /**
-     * 最后登录时间
-     */
-    @Schema(description = "最后登录时间")
-    @TableField("last_login_time")
-    private LocalDateTime lastLoginTime;
+    @Schema(description = "用户类型（0-普通用户，1-系统管理员）")
+    @TableField("user_type")
+    private Integer userType;
+
+    @Schema(description = "状态（0-禁用，1-正常）")
+    @TableField("status")
+    private Integer status;
 }

@@ -20,23 +20,14 @@ import lombok.NoArgsConstructor;
 @Schema(description = "创建运单请求")
 public class CreateWaybillRequest {
 
-    /**
-     * 订单ID
-     */
     @NotNull(message = "订单ID不能为空")
     @Schema(description = "订单ID", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long orderId;
 
-    /**
-     * 起始地址（仓库地址）
-     */
     @Schema(description = "起始地址（仓库地址）")
     private String fromAddress;
 
-    /**
-     * 目的地址（收货地址）
-     */
     @NotBlank(message = "目的地址不能为空")
-    @Schema(description = "目的地址", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "目的地址（收货地址）", requiredMode = Schema.RequiredMode.REQUIRED)
     private String toAddress;
 }

@@ -10,7 +10,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 /**
  * Redis配置
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Configuration
 public class RedisConfig {
@@ -28,7 +28,7 @@ public class RedisConfig {
         Jackson2JsonRedisSerializer<Object> jsonSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         template.setValueSerializer(jsonSerializer);
         template.setHashValueSerializer(jsonSerializer);
-        
+
         template.afterPropertiesSet();
         return template;
     }

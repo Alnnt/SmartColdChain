@@ -3,11 +3,12 @@ package com.coldchain.auth.common;
 /**
  * 认证相关常量
  *
- * @author ColdChain
+ * @author Alnnt
  */
 public class AuthConstants {
 
-    private AuthConstants() {}
+    private AuthConstants() {
+    }
 
     /**
      * 请求头中的Token前缀

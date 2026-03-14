@@ -23,17 +23,33 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Tag(name = "认证管理", description = "登录、登出、Token刷新")
+@Tag(name = "认证管理", description = "登录、注册、登出、Token刷新")
 public class AuthController {
 
     private final AuthService authService;
     private final JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/login")
-    @Operation(summary = "用户登录")
+    @Operation(summary = "系统管理员登录")
     public Result<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        log.info("登录请求: username={}", request.getUsername());
+        log.info("管理员登录请求: username={}", request.getUsername());
         LoginResponse response = authService.login(request);
+        return Result.success(response);
+    }
+
+    @PostMapping("/user/login")
+    @Operation(summary = "普通用户登录")
+    public Result<UserLoginResponse> userLogin(@Valid @RequestBody LoginRequest request) {
+        log.info("普通用户登录请求: username={}", request.getUsername());
+        UserLoginResponse response = authService.userLogin(request);
+        return Result.success(response);
+    }
+
+    @PostMapping("/register")
+    @Operation(summary = "用户注册")
+    public Result<UserLoginResponse> register(@Valid @RequestBody RegisterRequest request) {
+        log.info("用户注册请求: username={}", request.getUsername());
+        UserLoginResponse response = authService.register(request);
         return Result.success(response);
     }
 
@@ -69,9 +85,6 @@ public class AuthController {
         return Result.success(valid);
     }
 
-    /**
-     * 从请求中获取Token
-     */
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader(AuthConstants.AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(AuthConstants.TOKEN_PREFIX)) {
@@ -80,15 +93,11 @@ public class AuthController {
         return null;
     }
 
-    /**
-     * 从请求中获取用户ID
-     */
     private Long getUserIdFromRequest(HttpServletRequest request) {
         String token = getTokenFromRequest(request);
         if (token != null) {
             return jwtTokenUtil.getUserIdFromToken(token);
         }
-        // 也支持从网关传递的Header获取
         String userId = request.getHeader(AuthConstants.USER_ID_HEADER);
         if (StringUtils.hasText(userId)) {
             return Long.valueOf(userId);

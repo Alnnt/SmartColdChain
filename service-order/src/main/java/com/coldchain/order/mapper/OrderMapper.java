@@ -5,7 +5,7 @@ import com.coldchain.order.entity.Order;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 订单 Mapper
+ * 璁㈠崟 Mapper
  *
  * @author Alnnt
  */

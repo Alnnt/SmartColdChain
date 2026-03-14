@@ -5,12 +5,6 @@ spring:
   application:
     name: cold-chain-gateway
 
-  # 导入 Nacos 配置 (Spring Cloud Alibaba 2023.x 必需)
-  config:
-    import:
-      - optional:nacos:${spring.application.name}.yaml
-      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
-
   cloud:
     # Nacos配置
     nacos:
@@ -105,6 +99,7 @@ spring:
     redis:
       host: localhost
       port: 6379
+      password: redispw
       database: 1
       timeout: 3000ms
 

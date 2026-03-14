@@ -1,35 +1,19 @@
 package com.coldchain.user.service;
 
-import com.coldchain.user.dto.*;
+import com.coldchain.user.dto.UserVO;
 
 /**
  * 用户服务接口
  *
- * @author ColdChain
+ * @author Alnnt
  */
 public interface UserService {
 
     /**
-     * 用户注册
+     * 鑾峰彇褰撳墠鐢ㄦ埛淇℃伅
      *
-     * @param request 注册请求
-     * @return 登录响应（包含Token）
-     */
-    LoginResponse register(UserRegisterRequest request);
-
-    /**
-     * 用户登录
-     *
-     * @param request 登录请求
-     * @return 登录响应（包含Token）
-     */
-    LoginResponse login(UserLoginRequest request);
-
-    /**
-     * 获取当前用户信息
-     *
-     * @param userId 用户ID
-     * @return 用户信息
+     * @param userId 鐢ㄦ埛ID
+     * @return 鐢ㄦ埛淇℃伅
      */
     UserVO getCurrentUser(Long userId);
 

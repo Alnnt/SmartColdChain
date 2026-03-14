@@ -10,32 +10,32 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Knife4j配置
+ * Knife4j閰嶇疆
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Configuration
 public class Knife4jConfig {
 
-    @Bean
-    public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("认证授权服务API文档")
-                        .version("1.0.0")
-                        .description("冷链物流系统 - 认证授权服务API接口文档")
-                        .contact(new Contact()
-                                .name("ColdChain Team")
-                                .email("support@coldchain.com"))
-                        .license(new License()
-                                .name("Apache 2.0")
-                                .url("http://www.apache.org/licenses/LICENSE-2.0")))
-                .addSecurityItem(new SecurityRequirement().addList("Bearer"))
-                .schemaRequirement("Bearer", new SecurityScheme()
-                        .type(SecurityScheme.Type.HTTP)
-                        .scheme("bearer")
-                        .bearerFormat("JWT")
-                        .in(SecurityScheme.In.HEADER)
-                        .name("Authorization"));
-    }
+        @Bean
+        public OpenAPI customOpenAPI() {
+                return new OpenAPI()
+                                .info(new Info()
+                                                .title("璁よ瘉鎺堟潈鏈嶅姟API鏂囨。")
+                                                .version("1.0.0")
+                                                .description("鍐烽摼鐗╂祦绯荤粺 - 璁よ瘉鎺堟潈鏈嶅姟API鎺ュ彛鏂囨。")
+                                                .contact(new Contact()
+                                                                .name("ColdChain Team")
+                                                                .email("support@coldchain.com"))
+                                                .license(new License()
+                                                                .name("Apache 2.0")
+                                                                .url("http://www.apache.org/licenses/LICENSE-2.0")))
+                                .addSecurityItem(new SecurityRequirement().addList("Bearer"))
+                                .schemaRequirement("Bearer", new SecurityScheme()
+                                                .type(SecurityScheme.Type.HTTP)
+                                                .scheme("bearer")
+                                                .bearerFormat("JWT")
+                                                .in(SecurityScheme.In.HEADER)
+                                                .name("Authorization"));
+        }
 }

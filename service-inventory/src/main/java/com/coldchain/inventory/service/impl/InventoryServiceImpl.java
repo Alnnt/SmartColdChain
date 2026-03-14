@@ -14,9 +14,9 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * 库存服务实现类
+ * 搴撳瓨鏈嶅姟瀹炵幇绫?
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @Service
@@ -26,7 +26,7 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryMapper inventoryMapper;
 
     /**
-     * 地球半径（公里）
+     * 鍦扮悆鍗婂緞锛堝叕閲岋級
      */
     private static final double EARTH_RADIUS_KM = 6371.0;
 
@@ -34,22 +34,22 @@ public class InventoryServiceImpl implements InventoryService {
     @GlobalTransactional(name = "deduct-stock-tx", rollbackFor = Exception.class)
     @Transactional(rollbackFor = Exception.class)
     public DeductStockResponse deductStock(Long productId, Integer count, Double userLat, Double userLon) {
-        log.info("开始智能库存扣减, productId={}, count={}, userLocation=({}, {})",
+        log.info("寮€濮嬫櫤鑳藉簱瀛樻墸鍑? productId={}, count={}, userLocation=({}, {})",
                 productId, count, userLat, userLon);
 
-        // 1. 查询所有库存充足的仓库
+        // 1. 鏌ヨ鎵€鏈夊簱瀛樺厖瓒崇殑浠撳簱
         List<WarehouseStockDTO> warehouses = inventoryMapper.findWarehousesWithStock(productId, count);
 
         if (warehouses == null || warehouses.isEmpty()) {
-            log.warn("没有找到库存充足的仓库, productId={}, count={}", productId, count);
+            log.warn("娌℃湁鎵惧埌搴撳瓨鍏呰冻鐨勪粨搴? productId={}, count={}", productId, count);
             return DeductStockResponse.builder()
                     .success(false)
                     .build();
         }
 
-        log.info("找到 {} 个库存充足的仓库", warehouses.size());
+        log.info("鎵惧埌 {} 涓簱瀛樺厖瓒崇殑浠撳簱", warehouses.size());
 
-        // 2. 智能调度：找到距离用户最近的仓库
+        // 2. 鏅鸿兘璋冨害锛氭壘鍒拌窛绂荤敤鎴锋渶杩戠殑浠撳簱
         WarehouseStockDTO nearestWarehouse = findNearestWarehouse(warehouses, userLat, userLon);
 
         if (nearestWarehouse == null) {
@@ -59,32 +59,31 @@ public class InventoryServiceImpl implements InventoryService {
 
         double distance = calculateDistance(
                 userLat, userLon,
-                nearestWarehouse.getLatitude(), nearestWarehouse.getLongitude()
-        );
+                nearestWarehouse.getLatitude(), nearestWarehouse.getLongitude());
 
-        log.info("选中最近仓库: {} (ID={}), 距离: {:.2f} km",
+        log.info("閫変腑鏈€杩戜粨搴? {} (ID={}), 璺濈: {:.2f} km",
                 nearestWarehouse.getWarehouseName(),
                 nearestWarehouse.getWarehouseId(),
                 distance);
 
-        // 3. 乐观锁扣减库存
+        // 3. 涔愯閿佹墸鍑忓簱瀛?
         int affectedRows = inventoryMapper.deductStockWithOptimisticLock(
                 nearestWarehouse.getInventoryId(), count);
 
         if (affectedRows == 0) {
-            log.error("库存扣减失败，可能存在并发冲突, inventoryId={}", nearestWarehouse.getInventoryId());
-            // 抛出异常触发 Seata 全局事务回滚
-            throw new RuntimeException("库存扣减失败：库存不足或并发冲突，请重试");
+            log.error("搴撳瓨鎵ｅ噺澶辫触锛屽彲鑳藉瓨鍦ㄥ苟鍙戝啿绐? inventoryId={}", nearestWarehouse.getInventoryId());
+            // 鎶涘嚭寮傚父瑙﹀彂 Seata 鍏ㄥ眬浜嬪姟鍥炴粴
+            throw new RuntimeException("搴撳瓨鎵ｅ噺澶辫触锛氬簱瀛樹笉瓒虫垨骞跺彂鍐茬獊锛岃閲嶈瘯");
         }
 
-        log.info("库存扣减成功, inventoryId={}, deductedCount={}",
+        log.info("搴撳瓨鎵ｅ噺鎴愬姛, inventoryId={}, deductedCount={}",
                 nearestWarehouse.getInventoryId(), count);
 
         return DeductStockResponse.builder()
                 .success(true)
                 .warehouseId(nearestWarehouse.getWarehouseId())
                 .warehouseName(nearestWarehouse.getWarehouseName())
-                .distance(Math.round(distance * 100.0) / 100.0) // 保留两位小数
+                .distance(Math.round(distance * 100.0) / 100.0) // 淇濈暀涓や綅灏忔暟
                 .remainingStock(nearestWarehouse.getAvailableStock() - count)
                 .build();
     }
@@ -92,19 +91,19 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public DeductStockResponse freezeStock(Long productId, Integer count, Double userLat, Double userLon) {
-        log.info("开始冻结库存 (TCC-Try), productId={}, count={}", productId, count);
+        log.info("寮€濮嬪喕缁撳簱瀛?(TCC-Try), productId={}, count={}", productId, count);
 
-        // 1. 查询所有库存充足的仓库
+        // 1. 鏌ヨ鎵€鏈夊簱瀛樺厖瓒崇殑浠撳簱
         List<WarehouseStockDTO> warehouses = inventoryMapper.findWarehousesWithStock(productId, count);
 
         if (warehouses == null || warehouses.isEmpty()) {
-            log.warn("没有找到库存充足的仓库, productId={}, count={}", productId, count);
+            log.warn("娌℃湁鎵惧埌搴撳瓨鍏呰冻鐨勪粨搴? productId={}, count={}", productId, count);
             return DeductStockResponse.builder()
                     .success(false)
                     .build();
         }
 
-        // 2. 找到最近的仓库
+        // 2. 鎵惧埌鏈€杩戠殑浠撳簱
         WarehouseStockDTO nearestWarehouse = findNearestWarehouse(warehouses, userLat, userLon);
 
         if (nearestWarehouse == null) {
@@ -113,18 +112,17 @@ public class InventoryServiceImpl implements InventoryService {
 
         double distance = calculateDistance(
                 userLat, userLon,
-                nearestWarehouse.getLatitude(), nearestWarehouse.getLongitude()
-        );
+                nearestWarehouse.getLatitude(), nearestWarehouse.getLongitude());
 
-        // 3. 冻结库存
+        // 3. 鍐荤粨搴撳瓨
         int affectedRows = inventoryMapper.freezeStock(nearestWarehouse.getInventoryId(), count);
 
         if (affectedRows == 0) {
-            log.error("库存冻结失败, inventoryId={}", nearestWarehouse.getInventoryId());
-            throw new RuntimeException("库存冻结失败：库存不足或并发冲突");
+            log.error("搴撳瓨鍐荤粨澶辫触, inventoryId={}", nearestWarehouse.getInventoryId());
+            throw new RuntimeException("搴撳瓨鍐荤粨澶辫触锛氬簱瀛樹笉瓒虫垨骞跺彂鍐茬獊");
         }
 
-        log.info("库存冻结成功, inventoryId={}, frozenCount={}",
+        log.info("搴撳瓨鍐荤粨鎴愬姛, inventoryId={}, frozenCount={}",
                 nearestWarehouse.getInventoryId(), count);
 
         return DeductStockResponse.builder()
@@ -139,81 +137,80 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean confirmDeduct(Long inventoryId, Integer count) {
-        log.info("确认扣减库存 (TCC-Confirm), inventoryId={}, count={}", inventoryId, count);
+        log.info("纭鎵ｅ噺搴撳瓨 (TCC-Confirm), inventoryId={}, count={}", inventoryId, count);
 
         int affectedRows = inventoryMapper.confirmDeductStock(inventoryId, count);
 
         if (affectedRows == 0) {
-            log.error("确认扣减失败, inventoryId={}", inventoryId);
+            log.error("纭鎵ｅ噺澶辫触, inventoryId={}", inventoryId);
             return false;
         }
 
-        log.info("确认扣减成功, inventoryId={}", inventoryId);
+        log.info("纭鎵ｅ噺鎴愬姛, inventoryId={}", inventoryId);
         return true;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean cancelFreeze(Long inventoryId, Integer count) {
-        log.info("取消冻结库存 (TCC-Cancel), inventoryId={}, count={}", inventoryId, count);
+        log.info("鍙栨秷鍐荤粨搴撳瓨 (TCC-Cancel), inventoryId={}, count={}", inventoryId, count);
 
         int affectedRows = inventoryMapper.unfreezeStock(inventoryId, count);
 
         if (affectedRows == 0) {
-            log.error("取消冻结失败, inventoryId={}", inventoryId);
+            log.error("鍙栨秷鍐荤粨澶辫触, inventoryId={}", inventoryId);
             return false;
         }
 
-        log.info("取消冻结成功, inventoryId={}", inventoryId);
+        log.info("鍙栨秷鍐荤粨鎴愬姛, inventoryId={}", inventoryId);
         return true;
     }
 
     /**
-     * 找到距离用户最近的仓库
+     * 鎵惧埌璺濈鐢ㄦ埛鏈€杩戠殑浠撳簱
      *
-     * @param warehouses 仓库列表
-     * @param userLat    用户纬度
-     * @param userLon    用户经度
-     * @return 最近的仓库
+     * @param warehouses 浠撳簱鍒楄〃
+     * @param userLat    鐢ㄦ埛绾害
+     * @param userLon    鐢ㄦ埛缁忓害
+     * @return 鏈€杩戠殑浠撳簱
      */
     private WarehouseStockDTO findNearestWarehouse(List<WarehouseStockDTO> warehouses,
-                                                    Double userLat, Double userLon) {
+            Double userLat, Double userLon) {
         return warehouses.stream()
-                .min(Comparator.comparingDouble(warehouse ->
-                        calculateDistance(userLat, userLon,
-                                warehouse.getLatitude(), warehouse.getLongitude())))
+                .min(Comparator.comparingDouble(warehouse -> calculateDistance(userLat, userLon,
+                        warehouse.getLatitude(), warehouse.getLongitude())))
                 .orElse(null);
     }
 
     /**
-     * 使用 Haversine 公式计算两点之间的球面距离
+     * 浣跨敤 Haversine 鍏紡璁＄畻涓ょ偣涔嬮棿鐨勭悆闈㈣窛绂?
      * <p>
-     * Haversine 公式：
-     * a = sin²(Δlat/2) + cos(lat1) * cos(lat2) * sin²(Δlon/2)
-     * c = 2 * atan2(√a, √(1-a))
+     * Haversine 鍏紡锛?
+     * a = sin虏(螖lat/2) + cos(lat1) * cos(lat2) * sin虏(螖lon/2)
+     * c = 2 * atan2(鈭歛, 鈭?1-a))
      * d = R * c
      *
-     * @param lat1 点1纬度（度）
-     * @param lon1 点1经度（度）
-     * @param lat2 点2纬度（度）
-     * @param lon2 点2经度（度）
-     * @return 距离（公里）
+     * @param lat1 鐐?绾害锛堝害锛?
+     * @param lon1 鐐?缁忓害锛堝害锛?
+     * @param lat2 鐐?绾害锛堝害锛?
+     * @param lon2 鐐?缁忓害锛堝害锛?
+     * @return 璺濈锛堝叕閲岋級
      */
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-        // 将角度转换为弧度
+        // 灏嗚搴﹁浆鎹负寮у害
         double lat1Rad = Math.toRadians(lat1);
         double lat2Rad = Math.toRadians(lat2);
         double deltaLat = Math.toRadians(lat2 - lat1);
         double deltaLon = Math.toRadians(lon2 - lon1);
 
-        // Haversine 公式
+        // Haversine 鍏紡
         double a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2)
                 + Math.cos(lat1Rad) * Math.cos(lat2Rad)
-                * Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+                        * Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        // 计算距离
+        // 璁＄畻璺濈
         return EARTH_RADIUS_KM * c;
     }
 }

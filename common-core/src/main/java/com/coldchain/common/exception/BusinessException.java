@@ -4,7 +4,7 @@ import com.coldchain.common.result.ResultCode;
 import lombok.Getter;
 
 /**
- * 自定义业务异常
+ * 鑷畾涔変笟鍔″紓甯?
  *
  * @author Alnnt
  */
@@ -14,12 +14,12 @@ public class BusinessException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 错误码
+     * 閿欒鐮?
      */
     private final Integer code;
 
     /**
-     * 错误消息
+     * 閿欒娑堟伅
      */
     private final String message;
 

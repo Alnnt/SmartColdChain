@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * 司机实体
+ * 鍙告満瀹炰綋
  *
  * @author Alnnt
  */
@@ -21,29 +21,29 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @TableName("t_driver")
-@Schema(description = "司机实体")
+@Schema(description = "鍙告満瀹炰綋")
 public class Driver extends BaseEntity {
 
     /**
-     * 司机姓名
+     * 鍙告満濮撳悕
      */
-    @Schema(description = "司机姓名")
+    @Schema(description = "鍙告満濮撳悕")
     private String name;
 
     /**
-     * 联系电话
+     * 鑱旂郴鐢佃瘽
      */
-    @Schema(description = "联系电话")
+    @Schema(description = "鑱旂郴鐢佃瘽")
     private String phone;
 
     /**
-     * 车牌号
+     * 杞︾墝鍙?
      */
     @Schema(description = "车牌号")
     private String licensePlate;
 
     /**
-     * 状态（0-空闲，1-忙碌）
+     * 鐘舵€侊紙0-绌洪棽锛?-蹇欑锛?
      *
      * @see DriverStatus
      */
@@ -51,26 +51,26 @@ public class Driver extends BaseEntity {
     private Integer status;
 
     /**
-     * 当前纬度
+     * 褰撳墠绾害
      */
-    @Schema(description = "当前纬度")
+    @Schema(description = "褰撳墠绾害")
     private Double latitude;
 
     /**
-     * 当前经度
+     * 褰撳墠缁忓害
      */
-    @Schema(description = "当前经度")
+    @Schema(description = "褰撳墠缁忓害")
     private Double longitude;
 
     /**
-     * 判断司机是否空闲
+     * 鍒ゆ柇鍙告満鏄惁绌洪棽
      */
     public boolean isFree() {
         return DriverStatus.FREE.getCode().equals(this.status);
     }
 
     /**
-     * 判断司机是否忙碌
+     * 鍒ゆ柇鍙告満鏄惁蹇欑
      */
     public boolean isBusy() {
         return DriverStatus.BUSY.getCode().equals(this.status);

@@ -8,80 +8,80 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 风险分析请求
+ * 椋庨櫓鍒嗘瀽璇锋眰
  *
  * @author Alnnt
  */
 @Data
-@Schema(description = "运输风险分析请求")
+@Schema(description = "杩愯緭椋庨櫓鍒嗘瀽璇锋眰")
 public class RiskAnalysisRequest {
 
     /**
-     * 设备ID
+     * 璁惧ID
      */
-    @NotBlank(message = "设备ID不能为空")
-    @Schema(description = "IoT设备ID", example = "DEVICE-001")
+    @NotBlank(message = "璁惧ID涓嶈兘涓虹┖")
+    @Schema(description = "IoT璁惧ID", example = "DEVICE-001")
     private String deviceId;
 
     /**
-     * 运输单ID
+     * 杩愯緭鍗旾D
      */
-    @Schema(description = "运输单ID", example = "TRANS-2024-001")
+    @Schema(description = "杩愯緭鍗旾D", example = "TRANS-2024-001")
     private String transportId;
 
     /**
-     * 货物类型
+     * 璐х墿绫诲瀷
      */
-    @Schema(description = "货物类型", example = "冷冻海鲜")
+    @Schema(description = "璐х墿绫诲瀷", example = "鍐峰喕娴烽矞")
     private String cargoType;
 
     /**
-     * 可接受最低温度
+     * 鍙帴鍙楁渶浣庢俯搴?
      */
-    @Schema(description = "可接受最低温度(°C)", example = "-20")
+    @Schema(description = "鍙帴鍙楁渶浣庢俯搴?掳C)", example = "-20")
     private Double acceptableMinTemp;
 
     /**
-     * 可接受最高温度
+     * 鍙帴鍙楁渶楂樻俯搴?
      */
-    @Schema(description = "可接受最高温度(°C)", example = "-15")
+    @Schema(description = "鍙帴鍙楁渶楂樻俯搴?掳C)", example = "-15")
     private Double acceptableMaxTemp;
 
     /**
-     * 温度读数列表
+     * 娓╁害璇绘暟鍒楄〃
      */
-    @Schema(description = "温度读数列表")
+    @Schema(description = "娓╁害璇绘暟鍒楄〃")
     private List<TemperatureReading> temperatureReadings;
 
     /**
-     * 附加说明
+     * 闄勫姞璇存槑
      */
-    @Schema(description = "附加说明")
+    @Schema(description = "闄勫姞璇存槑")
     private String additionalNotes;
 
     /**
-     * 温度读数
+     * 娓╁害璇绘暟
      */
     @Data
-    @Schema(description = "温度读数")
+    @Schema(description = "娓╁害璇绘暟")
     public static class TemperatureReading {
 
         /**
-         * 时间戳
+         * 鏃堕棿鎴?
          */
-        @Schema(description = "采集时间")
+        @Schema(description = "閲囬泦鏃堕棿")
         private LocalDateTime timestamp;
 
         /**
-         * 温度值
+         * 娓╁害鍊?
          */
-        @Schema(description = "温度(°C)", example = "-18.5")
+        @Schema(description = "娓╁害(掳C)", example = "-18.5")
         private Double temperature;
 
         /**
-         * 湿度值
+         * 婀垮害鍊?
          */
-        @Schema(description = "湿度(%)", example = "65")
+        @Schema(description = "婀垮害(%)", example = "65")
         private Double humidity;
     }
 }

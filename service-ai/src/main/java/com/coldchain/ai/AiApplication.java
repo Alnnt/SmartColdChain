@@ -5,8 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
- * AI服务启动类
- * 提供LLM集成、智能助手、风险分析等AI能力
+ * AI鏈嶅姟鍚姩绫?
+ * 鎻愪緵LLM闆嗘垚銆佹櫤鑳藉姪鎵嬨€侀闄╁垎鏋愮瓑AI鑳藉姏
  *
  * @author Alnnt
  */

@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * 运输服务实现类
+ * 杩愯緭鏈嶅姟瀹炵幇绫?
  *
- * @author ColdChain
+ * @author Alnnt
  */
 @Slf4j
 @Service
@@ -31,34 +31,33 @@ public class TransportServiceImpl implements TransportService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TransportOrder createWaybill(Long orderId, String fromAddress, String toAddress) {
-        log.info("开始创建运单, orderId={}, fromAddress={}, toAddress={}", orderId, fromAddress, toAddress);
+        log.info("寮€濮嬪垱寤鸿繍鍗? orderId={}, fromAddress={}, toAddress={}", orderId, fromAddress, toAddress);
 
-        // 1. 查找第一个空闲司机（使用 SELECT ... FOR UPDATE 加锁）
+        // 1. 鏌ユ壘绗竴涓┖闂插徃鏈猴紙浣跨敤 SELECT ... FOR UPDATE 鍔犻攣锛?
         Driver freeDriver = driverMapper.findFirstFreeDriver();
 
         if (freeDriver == null) {
-            log.error("没有可用的空闲司机");
+            log.error("没有可用的空闲司机");
             throw new RuntimeException("No available drivers");
         }
 
-        log.info("找到空闲司机: {} (ID={}), 车牌: {}",
+        log.info("鎵惧埌绌洪棽鍙告満: {} (ID={}), 杞︾墝: {}",
                 freeDriver.getName(), freeDriver.getId(), freeDriver.getLicensePlate());
 
-        // 2. 锁定司机（状态改为BUSY）
+        // 2. 閿佸畾鍙告満锛堢姸鎬佹敼涓築USY锛?
         int updateCount = driverMapper.updateDriverStatus(
                 freeDriver.getId(),
                 DriverStatus.FREE.getCode(),
-                DriverStatus.BUSY.getCode()
-        );
+                DriverStatus.BUSY.getCode());
 
         if (updateCount == 0) {
-            log.error("锁定司机失败，可能存在并发冲突, driverId={}", freeDriver.getId());
+            log.error("閿佸畾鍙告満澶辫触锛屽彲鑳藉瓨鍦ㄥ苟鍙戝啿绐? driverId={}", freeDriver.getId());
             throw new RuntimeException("Failed to lock driver, please retry");
         }
 
-        log.info("司机已锁定: {} (ID={})", freeDriver.getName(), freeDriver.getId());
+        log.info("鍙告満宸查攣瀹? {} (ID={})", freeDriver.getName(), freeDriver.getId());
 
-        // 3. 创建运单记录
+        // 3. 鍒涘缓杩愬崟璁板綍
         TransportOrder transportOrder = TransportOrder.builder()
                 .orderId(orderId)
                 .driverId(freeDriver.getId())
@@ -69,7 +68,7 @@ public class TransportServiceImpl implements TransportService {
 
         transportOrderMapper.insert(transportOrder);
 
-        log.info("运单创建成功, transportOrderId={}, driverId={}, orderId={}",
+        log.info("杩愬崟鍒涘缓鎴愬姛, transportOrderId={}, driverId={}, orderId={}",
                 transportOrder.getId(), freeDriver.getId(), orderId);
 
         return transportOrder;
@@ -83,56 +82,54 @@ public class TransportServiceImpl implements TransportService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean startTransport(Long transportOrderId) {
-        log.info("开始运输, transportOrderId={}", transportOrderId);
+        log.info("寮€濮嬭繍杈? transportOrderId={}", transportOrderId);
 
         int updateCount = transportOrderMapper.updateStatus(
                 transportOrderId,
                 TransportStatus.WAITING.getCode(),
-                TransportStatus.IN_TRANSIT.getCode()
-        );
+                TransportStatus.IN_TRANSIT.getCode());
 
         if (updateCount == 0) {
-            log.error("更新运单状态失败, transportOrderId={}", transportOrderId);
+            log.error("鏇存柊杩愬崟鐘舵€佸け璐? transportOrderId={}", transportOrderId);
             return false;
         }
 
-        log.info("运单状态已更新为运输中, transportOrderId={}", transportOrderId);
+        log.info("杩愬崟鐘舵€佸凡鏇存柊涓鸿繍杈撲腑, transportOrderId={}", transportOrderId);
         return true;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean completeTransport(Long transportOrderId) {
-        log.info("完成运输, transportOrderId={}", transportOrderId);
+        log.info("瀹屾垚杩愯緭, transportOrderId={}", transportOrderId);
 
-        // 1. 获取运单信息
+        // 1. 鑾峰彇杩愬崟淇℃伅
         TransportOrder transportOrder = transportOrderMapper.selectById(transportOrderId);
         if (transportOrder == null) {
-            log.error("运单不存在, transportOrderId={}", transportOrderId);
+            log.error("杩愬崟涓嶅瓨鍦? transportOrderId={}", transportOrderId);
             return false;
         }
 
-        // 2. 更新运单状态为已送达
+        // 2. 鏇存柊杩愬崟鐘舵€佷负宸查€佽揪
         int updateCount = transportOrderMapper.markAsDelivered(transportOrderId);
 
         if (updateCount == 0) {
-            log.error("更新运单状态失败, transportOrderId={}", transportOrderId);
+            log.error("鏇存柊杩愬崟鐘舵€佸け璐? transportOrderId={}", transportOrderId);
             return false;
         }
 
-        // 3. 释放司机（状态改为FREE）
+        // 3. 閲婃斁鍙告満锛堢姸鎬佹敼涓篎REE锛?
         int driverUpdateCount = driverMapper.updateDriverStatus(
                 transportOrder.getDriverId(),
                 DriverStatus.BUSY.getCode(),
-                DriverStatus.FREE.getCode()
-        );
+                DriverStatus.FREE.getCode());
 
         if (driverUpdateCount == 0) {
-            log.warn("释放司机状态失败, driverId={}", transportOrder.getDriverId());
-            // 不抛异常，运单已完成
+            log.warn("閲婃斁鍙告満鐘舵€佸け璐? driverId={}", transportOrder.getDriverId());
+            // 涓嶆姏寮傚父锛岃繍鍗曞凡瀹屾垚
         }
 
-        log.info("运输完成, transportOrderId={}, driverId={}",
+        log.info("杩愯緭瀹屾垚, transportOrderId={}, driverId={}",
                 transportOrderId, transportOrder.getDriverId());
         return true;
     }
@@ -140,46 +137,44 @@ public class TransportServiceImpl implements TransportService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean cancelTransport(Long transportOrderId) {
-        log.info("取消运单, transportOrderId={}", transportOrderId);
+        log.info("鍙栨秷杩愬崟, transportOrderId={}", transportOrderId);
 
-        // 1. 获取运单信息
+        // 1. 鑾峰彇杩愬崟淇℃伅
         TransportOrder transportOrder = transportOrderMapper.selectById(transportOrderId);
         if (transportOrder == null) {
-            log.error("运单不存在, transportOrderId={}", transportOrderId);
+            log.error("杩愬崟涓嶅瓨鍦? transportOrderId={}", transportOrderId);
             return false;
         }
 
-        // 只有待取货状态的运单可以取消
+        // 鍙湁寰呭彇璐х姸鎬佺殑杩愬崟鍙互鍙栨秷
         if (!TransportStatus.WAITING.getCode().equals(transportOrder.getStatus())) {
-            log.error("运单状态不允许取消, transportOrderId={}, status={}",
+            log.error("杩愬崟鐘舵€佷笉鍏佽鍙栨秷, transportOrderId={}, status={}",
                     transportOrderId, transportOrder.getStatus());
             return false;
         }
 
-        // 2. 更新运单状态为已取消
+        // 2. 鏇存柊杩愬崟鐘舵€佷负宸插彇娑?
         int updateCount = transportOrderMapper.updateStatus(
                 transportOrderId,
                 TransportStatus.WAITING.getCode(),
-                TransportStatus.CANCELLED.getCode()
-        );
+                TransportStatus.CANCELLED.getCode());
 
         if (updateCount == 0) {
-            log.error("更新运单状态失败, transportOrderId={}", transportOrderId);
+            log.error("鏇存柊杩愬崟鐘舵€佸け璐? transportOrderId={}", transportOrderId);
             return false;
         }
 
-        // 3. 释放司机
+        // 3. 閲婃斁鍙告満
         int driverUpdateCount = driverMapper.updateDriverStatus(
                 transportOrder.getDriverId(),
                 DriverStatus.BUSY.getCode(),
-                DriverStatus.FREE.getCode()
-        );
+                DriverStatus.FREE.getCode());
 
         if (driverUpdateCount == 0) {
-            log.warn("释放司机状态失败, driverId={}", transportOrder.getDriverId());
+            log.warn("閲婃斁鍙告満鐘舵€佸け璐? driverId={}", transportOrder.getDriverId());
         }
 
-        log.info("运单已取消, transportOrderId={}", transportOrderId);
+        log.info("杩愬崟宸插彇娑? transportOrderId={}", transportOrderId);
         return true;
     }
 
