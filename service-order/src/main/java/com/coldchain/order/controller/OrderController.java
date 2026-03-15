@@ -100,7 +100,11 @@ public class OrderController {
     private Long getUserIdFromRequest(HttpServletRequest request) {
         String userId = request.getHeader("X-User-Id");
         if (StringUtils.hasText(userId)) {
-            return Long.valueOf(userId);
+            try {
+                return Long.valueOf(userId.trim());
+            } catch (NumberFormatException e) {
+                return null;
+            }
         }
         return null;
     }

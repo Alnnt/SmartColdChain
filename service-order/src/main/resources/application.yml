@@ -61,7 +61,7 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-# Seata 分布式事务配置
+# Seata 分布式事务配置（Seata Server 未就绪或通信异常时可设为 false，仅用本地事务）
 seata:
   enabled: true
   application-id: ${spring.application.name}

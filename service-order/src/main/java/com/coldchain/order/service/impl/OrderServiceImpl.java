@@ -46,10 +46,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final Snowflake snowflake = IdUtil.getSnowflake(1, 1);
 
     /**
-     * 创建订单（分布式事务）
+     * 创建订单（Seata 开启时为分布式事务；关闭时仅本地事务，库存/运单失败会回滚订单）
      * 流程：创建订单 -> 扣减库存 -> 创建运单 -> 更新订单运单ID
      */
     @Override
+//    @Transactional(rollbackFor = Exception.class)
     @GlobalTransactional(name = "create-order-tx", rollbackFor = Exception.class)
     public OrderVO createOrder(OrderCreateDTO dto, Long userId) {
         Long productId = parseId(dto.getProductId(), "商品ID");
@@ -99,10 +100,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             log.error("运单创建失败: {}", transportResult.getMessage());
             throw new BusinessException(ResultCode.TRANSPORT_NOT_FOUND, transportResult.getMessage());
         }
-        log.info("运单创建成功: waybillId={}", transportResult.getData().getId());
+        WaybillVO waybillVO = transportResult.getData();
+        if (waybillVO == null || waybillVO.getId() == null) {
+            log.error("运单创建返回数据为空");
+            throw new BusinessException(ResultCode.TRANSPORT_NOT_FOUND, "运单创建成功但返回数据异常");
+        }
+        log.info("运单创建成功: waybillId={}", waybillVO.getId());
 
         // 5. 更新订单关联运单ID
-        order.setWaybillId(transportResult.getData().getId());
+        order.setWaybillId(waybillVO.getId());
         this.updateById(order);
 
         log.info("订单创建完成: orderId={}, orderNo={}, waybillId={}",

@@ -7,6 +7,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -132,13 +133,31 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理运行时异常
+     * 处理运行时异常。
+     * 若异常链中存在 BusinessException（如被 Seata 等框架包装），则按业务异常返回 200 + 可读信息；否则返回 500。
      */
     @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Result<Void> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
+    public ResponseEntity<Result<Void>> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
+        BusinessException businessEx = findBusinessException(e);
+        if (businessEx != null) {
+            log.warn("业务异常(由运行时异常包装): URI={}, Code={}, Message={}", request.getRequestURI(), businessEx.getCode(), businessEx.getMessage());
+            return ResponseEntity.ok(Result.fail(businessEx.getCode(), businessEx.getMessage()));
+        }
         log.error("运行时异常: URI={}, Message={}", request.getRequestURI(), e.getMessage(), e);
-        return Result.fail(ResultCode.INTERNAL_SERVER_ERROR.getCode(), "服务器内部错误，请稍后重试");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Result.fail(ResultCode.INTERNAL_SERVER_ERROR.getCode(), "服务器内部错误，请稍后重试"));
+    }
+
+    /**
+     * 从异常链中查找 BusinessException（用于 Seata 等包装后的场景）
+     */
+    private static BusinessException findBusinessException(Throwable t) {
+        for (Throwable x = t; x != null; x = x.getCause()) {
+            if (x instanceof BusinessException) {
+                return (BusinessException) x;
+            }
+        }
+        return null;
     }
 
     /**
