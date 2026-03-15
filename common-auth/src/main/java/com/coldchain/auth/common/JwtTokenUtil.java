@@ -47,13 +47,22 @@ public class JwtTokenUtil {
      * 生成访问Token
      */
     public String generateAccessToken(Long userId, String username, List<String> roles, List<String> permissions) {
+        return generateAccessToken(userId, username, roles, permissions, null);
+    }
+
+    /**
+     * 生成访问Token（可选携带仓库ID，用于仓库管理员）
+     */
+    public String generateAccessToken(Long userId, String username, List<String> roles, List<String> permissions, Long warehouseId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("username", username);
         claims.put("roles", roles);
         claims.put("permissions", permissions);
         claims.put("type", AuthConstants.TOKEN_TYPE_ACCESS);
-
+        if (warehouseId != null) {
+            claims.put("warehouseId", warehouseId);
+        }
         return buildToken(claims, username, accessTokenExpiration);
     }
 
@@ -170,6 +179,21 @@ public class JwtTokenUtil {
         Claims claims = getClaimsFromToken(token);
         if (claims != null) {
             return claims.get("permissions", List.class);
+        }
+        return null;
+    }
+
+    /**
+     * 从Token中获取仓库ID（仓库管理员时有值）
+     */
+    public Long getWarehouseIdFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        if (claims != null) {
+            Object wh = claims.get("warehouseId");
+            if (wh instanceof Integer) {
+                return ((Integer) wh).longValue();
+            }
+            return (Long) wh;
         }
         return null;
     }

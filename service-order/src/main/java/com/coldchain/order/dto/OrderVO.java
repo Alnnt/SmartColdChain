@@ -40,6 +40,11 @@ public class OrderVO {
     private String productId;
 
     /**
+     * 商品名称
+     */
+    private String productName;
+
+    /**
      * 购买数量
      */
     private Integer count;
@@ -58,6 +63,11 @@ public class OrderVO {
      * 订单状态描述
      */
     private String statusDesc;
+
+    /**
+     * 履约仓库ID（文本传输）
+     */
+    private String warehouseId;
 
     /**
      * 收货地址ID（文本传输）

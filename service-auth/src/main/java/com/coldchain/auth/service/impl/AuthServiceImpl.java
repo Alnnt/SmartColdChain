@@ -60,7 +60,8 @@ public class AuthServiceImpl implements AuthService {
         List<String> roleCodes = loadRoleCodes(user.getId());
         List<String> permissionCodes = loadPermissionCodes(user.getId());
 
-        String accessToken = jwtTokenUtil.generateAccessToken(user.getId(), user.getUsername(), roleCodes, permissionCodes);
+        Long warehouseId = user.getWarehouseId();
+        String accessToken = jwtTokenUtil.generateAccessToken(user.getId(), user.getUsername(), roleCodes, permissionCodes, warehouseId);
         String refreshToken = jwtTokenUtil.generateRefreshToken(user.getId(), user.getUsername());
 
         log.info("用户登录成功: username={}", user.getUsername());
@@ -72,6 +73,7 @@ public class AuthServiceImpl implements AuthService {
                 .avatar(user.getAvatar())
                 .roles(roleCodes)
                 .permissions(permissionCodes)
+                .warehouseId(warehouseId != null ? String.valueOf(warehouseId) : null)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .expiresIn(jwtTokenUtil.getAccessTokenExpiration())
@@ -205,6 +207,7 @@ public class AuthServiceImpl implements AuthService {
                 .avatar(user.getAvatar())
                 .roles(roleCodes)
                 .permissions(permissionCodes)
+                .warehouseId(user.getWarehouseId() != null ? String.valueOf(user.getWarehouseId()) : null)
                 .build();
     }
 

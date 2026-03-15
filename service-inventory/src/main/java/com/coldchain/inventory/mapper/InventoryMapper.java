@@ -156,6 +156,21 @@ public interface InventoryMapper extends BaseMapper<Inventory> {
     List<InventoryItemDTO> listInventoryItems();
 
     /**
+     * 管理端：按仓库查询库存列表
+     */
+    @Select("""
+            SELECT i.id, i.product_id AS productId, i.warehouse_id AS warehouseId,
+                   w.name AS warehouseName, i.total_stock AS totalStock,
+                   i.frozen_stock AS frozenStock,
+                   (i.total_stock - i.frozen_stock) AS availableStock
+            FROM t_inventory i
+            INNER JOIN t_warehouse w ON i.warehouse_id = w.id
+            WHERE i.deleted = 0 AND w.deleted = 0 AND i.warehouse_id = #{warehouseId}
+            ORDER BY i.product_id
+            """)
+    List<InventoryItemDTO> listInventoryItemsByWarehouseId(@Param("warehouseId") Long warehouseId);
+
+    /**
      * 管理端：调整库存（总库存增减，需保证调整后总库存 >= 0 且 >= 冻结库存）
      */
     @Update("""

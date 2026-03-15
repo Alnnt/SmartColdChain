@@ -17,6 +17,7 @@ CREATE TABLE `t_order` (
     `count` INT NOT NULL DEFAULT 1 COMMENT '购买数量',
     `amount` DECIMAL(12, 2) NOT NULL COMMENT '订单金额',
     `status` TINYINT NOT NULL DEFAULT 0 COMMENT '订单状态（0-待支付，1-已支付，2-已发货，3-已完成，4-已取消）',
+    `warehouse_id` BIGINT DEFAULT NULL COMMENT '履约仓库ID',
     `address_id` BIGINT DEFAULT NULL COMMENT '收货地址ID',
     `waybill_id` BIGINT DEFAULT NULL COMMENT '运单ID',
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -25,6 +26,7 @@ CREATE TABLE `t_order` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_order_no` (`order_no`),
     KEY `idx_user_id` (`user_id`),
+    KEY `idx_warehouse_id` (`warehouse_id`),
     KEY `idx_status` (`status`),
     KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单表';

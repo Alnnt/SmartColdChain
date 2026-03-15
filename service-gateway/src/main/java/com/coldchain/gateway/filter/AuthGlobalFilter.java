@@ -96,11 +96,22 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             return unauthorized(exchange, "Token解析失败");
         }
 
+        List<String> roles = jwtTokenUtil.getRolesFromToken(token);
+        Long warehouseId = jwtTokenUtil.getWarehouseIdFromToken(token);
+        String rolesHeader = (roles != null && !roles.isEmpty()) ? String.join(",", roles) : "";
+        String warehouseIdHeader = (warehouseId != null) ? String.valueOf(warehouseId) : "";
+
         // 将用户信息添加到请求头，传递给下游服务
-        ServerHttpRequest mutatedRequest = request.mutate()
+        ServerHttpRequest.Builder headerBuilder = request.mutate()
                 .header(AuthConstants.USER_ID_HEADER, String.valueOf(userId))
-                .header(AuthConstants.USERNAME_HEADER, username != null ? username : "")
-                .build();
+                .header(AuthConstants.USERNAME_HEADER, username != null ? username : "");
+        if (!rolesHeader.isEmpty()) {
+            headerBuilder.header(AuthConstants.ROLES_HEADER, rolesHeader);
+        }
+        if (!warehouseIdHeader.isEmpty()) {
+            headerBuilder.header(AuthConstants.WAREHOUSE_ID_HEADER, warehouseIdHeader);
+        }
+        ServerHttpRequest mutatedRequest = headerBuilder.build();
 
         log.debug("认证通过，用户ID: {}, 用户名: {}", userId, username);
 

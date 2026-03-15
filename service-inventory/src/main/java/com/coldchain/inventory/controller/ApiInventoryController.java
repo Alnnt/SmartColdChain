@@ -27,11 +27,11 @@ public class ApiInventoryController {
     private final InventoryService inventoryService;
 
     /**
-     * 按商品扣减库存（无地理位置时使用 0,0 选仓）
+     * 按商品扣减库存（无地理位置时使用 0,0 选仓），返回选中的仓库ID供订单落库
      */
     @PostMapping("/decrease")
     @Operation(summary = "扣减库存")
-    public Result<Boolean> decrease(
+    public Result<DeductStockResponse> decrease(
             @RequestParam(value = "productId") String productIdStr,
             @RequestParam("count") Integer count) {
         Long productId = parseLong(productIdStr, "商品ID");
@@ -47,7 +47,7 @@ public class ApiInventoryController {
                 request.getUserLat(),
                 request.getUserLon());
         if (response.getSuccess()) {
-            return Result.success(true);
+            return Result.success(response);
         }
         return Result.fail("库存不足，扣减失败");
     }

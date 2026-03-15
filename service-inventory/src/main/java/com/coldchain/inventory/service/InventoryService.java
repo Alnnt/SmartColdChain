@@ -68,17 +68,22 @@ public interface InventoryService {
     boolean rollbackStock(Long productId, Integer count);
 
     /**
-     * 管理端：查询所有仓库
+     * 管理端：查询仓库列表（warehouseId 非空时只返回该仓）
      */
-    List<Warehouse> listWarehouses();
+    List<Warehouse> listWarehouses(Long warehouseId);
 
     /**
-     * 管理端：查询库存列表（含仓库名称）
+     * 管理端：查询库存列表（warehouseId 非空时只返回该仓）
      */
-    List<InventoryItemDTO> listInventoryItems();
+    List<InventoryItemDTO> listInventoryItems(Long warehouseId);
 
     /**
      * 管理端：调整库存（正数增加、负数减少）
      */
     boolean adjustStock(Long inventoryId, Integer delta);
+
+    /**
+     * 管理端：添加库存商品（有则加数量，无则新增一条）
+     */
+    boolean addInventoryItem(Long warehouseId, Long productId, Integer quantity);
 }

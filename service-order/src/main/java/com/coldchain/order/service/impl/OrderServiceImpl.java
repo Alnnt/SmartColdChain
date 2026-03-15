@@ -15,6 +15,7 @@ import com.coldchain.order.entity.Order;
 import com.coldchain.order.entity.enums.OrderStatus;
 import com.coldchain.order.feign.InventoryClient;
 import com.coldchain.order.feign.TransportClient;
+import com.coldchain.order.feign.dto.DecreaseStockVO;
 import com.coldchain.order.feign.dto.WaybillCreateDTO;
 import com.coldchain.order.feign.dto.WaybillVO;
 import com.coldchain.order.mapper.OrderMapper;
@@ -81,12 +82,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         log.info("订单创建成功: orderId={}, orderNo={}", order.getId(), orderNo);
 
         // 3. 调用库存服务扣减库存（传文本 id 避免 Feign 序列化 Long 溢出）
-        Result<Boolean> inventoryResult = inventoryClient.decreaseStock(String.valueOf(productId), dto.getProductCount());
+        Result<DecreaseStockVO> inventoryResult = inventoryClient.decreaseStock(String.valueOf(productId), dto.getProductCount());
         if (!inventoryResult.isSuccess()) {
             log.error("库存扣减失败: {}", inventoryResult.getMessage());
             throw new BusinessException(ResultCode.INVENTORY_NOT_ENOUGH, inventoryResult.getMessage());
         }
-        log.info("库存扣减成功: productId={}, count={}", productId, dto.getProductCount());
+        DecreaseStockVO decreaseData = inventoryResult.getData();
+        if (decreaseData != null && decreaseData.getWarehouseId() != null) {
+            order.setWarehouseId(decreaseData.getWarehouseId());
+            this.updateById(order);
+        }
+        log.info("库存扣减成功: productId={}, count={}, warehouseId={}", productId, dto.getProductCount(), order.getWarehouseId());
 
         // 4. 调用运输服务创建运单
         WaybillCreateDTO waybillDTO = WaybillCreateDTO.builder()
@@ -206,6 +212,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     @Override
+    public IPage<OrderVO> listByWarehouseId(Long warehouseId, Integer page, Integer pageSize) {
+        LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<Order>()
+                .orderByDesc(Order::getCreateTime);
+        if (warehouseId != null) {
+            wrapper.eq(Order::getWarehouseId, warehouseId);
+        }
+        Page<Order> pageParam = new Page<>(page, pageSize);
+        IPage<Order> orderPage = this.page(pageParam, wrapper);
+        return orderPage.convert(this::convertToVO);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean shipOrder(Long orderId, Long warehouseId, boolean isSuperAdmin) {
+        Order order = this.getById(orderId);
+        if (order == null) {
+            throw new BusinessException(ResultCode.ORDER_NOT_FOUND);
+        }
+        if (!OrderStatus.PAID.getCode().equals(order.getStatus())) {
+            throw new BusinessException(ResultCode.ORDER_STATUS_ERROR, "只有已支付订单可发货");
+        }
+        if (!isSuperAdmin && warehouseId != null && !warehouseId.equals(order.getWarehouseId())) {
+            throw new BusinessException(ResultCode.FAIL, "无权操作该仓库的订单");
+        }
+        order.setStatus(OrderStatus.SHIPPED.getCode());
+        return this.updateById(order);
+    }
+
+    @Override
     public IPage<OrderVO> listByUserId(Long userId, Integer page, Integer pageSize) {
         log.info("查询用户订单列表: userId={}, page={}, pageSize={}", userId, page, pageSize);
 
@@ -249,9 +284,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .orderNo(order.getOrderNo())
                 .userId(order.getUserId() != null ? String.valueOf(order.getUserId()) : null)
                 .productId(order.getProductId() != null ? String.valueOf(order.getProductId()) : null)
+                .productName(order.getProductName())
                 .count(order.getProductCount())
                 .amount(order.getAmount())
                 .status(order.getStatus())
+                .warehouseId(order.getWarehouseId() != null ? String.valueOf(order.getWarehouseId()) : null)
                 .addressId(order.getAddressId() != null ? String.valueOf(order.getAddressId()) : null)
                 .waybillId(order.getWaybillId() != null ? String.valueOf(order.getWaybillId()) : null)
                 .createTime(order.getCreateTime())

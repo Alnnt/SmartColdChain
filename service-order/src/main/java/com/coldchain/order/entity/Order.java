@@ -67,6 +67,12 @@ public class Order extends BaseEntity {
     private Integer status;
 
     /**
+     * 履约仓库ID
+     */
+    @TableField("warehouse_id")
+    private Long warehouseId;
+
+    /**
      * 收货地址ID
      */
     @TableField("address_id")

@@ -43,4 +43,7 @@ public class UserInfoVO {
 
     @Schema(description = "权限列表")
     private List<String> permissions;
+
+    @Schema(description = "绑定仓库ID（仓库管理员时有值，文本传输）")
+    private String warehouseId;
 }

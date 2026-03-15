@@ -19,6 +19,7 @@ CREATE TABLE t_user (
     email VARCHAR(100) COMMENT '邮箱',
     avatar VARCHAR(500) COMMENT '头像URL',
     user_type TINYINT DEFAULT 0 COMMENT '用户类型（0-普通用户，1-系统管理员）',
+    warehouse_id BIGINT NULL COMMENT '绑定仓库ID（仓库管理员必填）',
     status TINYINT DEFAULT 1 COMMENT '状态（0-禁用，1-正常）',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -125,6 +126,9 @@ INSERT INTO t_user (username, password, nickname, phone, user_type, status) VALU
 ('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '超级管理员', '13800000000', 1, 1),
 ('operator', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '运营人员', '13800000001', 1, 1),
 ('warehouse', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '仓库管理员', '13800000002', 1, 1);
+
+-- 仓库管理员绑定仓库（仓库 id=1 需在 cold_chain_inventory 已存在）
+UPDATE t_user SET warehouse_id = 1 WHERE username = 'warehouse';
 
 -- 插入普通测试用户（user_type=0）
 INSERT INTO t_user (username, password, nickname, phone, user_type, status) VALUES

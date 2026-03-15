@@ -1,6 +1,7 @@
 package com.coldchain.order.feign;
 
 import com.coldchain.common.result.Result;
+import com.coldchain.order.feign.dto.DecreaseStockVO;
 import com.coldchain.order.feign.fallback.InventoryClientFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,15 +16,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface InventoryClient {
 
     /**
-     * 扣减库存
+     * 扣减库存，返回选中的仓库ID
      *
      * @param productId 商品ID
      * @param count     扣减数量
-     * @return 操作结果
+     * @return 操作结果（含 success、warehouseId）
      */
     @PostMapping("/api/inventory/decrease")
-    Result<Boolean> decreaseStock(@RequestParam("productId") String productId,
-                                  @RequestParam("count") Integer count);
+    Result<DecreaseStockVO> decreaseStock(@RequestParam("productId") String productId,
+                                          @RequestParam("count") Integer count);
 
     /**
      * 回滚库存（用于补偿）

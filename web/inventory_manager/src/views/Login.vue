@@ -48,6 +48,8 @@ async function submit() {
         username: data.username,
         nickname: data.nickname,
         avatar: data.avatar,
+        roles: data.roles || [],
+        warehouseId: data.warehouseId || null,
       })
       const redirect = route.query.redirect || '/'
       router.push(redirect)

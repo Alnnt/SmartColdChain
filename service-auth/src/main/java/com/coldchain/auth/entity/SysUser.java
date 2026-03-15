@@ -41,7 +41,13 @@ public class SysUser {
     private Integer userType;
 
     /**
-     * 鐘舵€侊紙0-绂佺敤锛?-姝ｅ父锛?
+     * 绑定仓库ID（仓库管理员必填）
+     */
+    @TableField("warehouse_id")
+    private Long warehouseId;
+
+    /**
+     * 状态（0-禁用，1-正常）
      */
     private Integer status;
 

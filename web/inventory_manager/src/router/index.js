@@ -15,6 +15,7 @@ const routes = [
       { path: '', name: 'Dashboard', redirect: '/inventory' },
       { path: 'inventory', name: 'Inventory', component: () => import('../views/InventoryList.vue'), meta: { title: '库存列表' } },
       { path: 'warehouses', name: 'Warehouses', component: () => import('../views/WarehouseList.vue'), meta: { title: '仓库管理' } },
+      { path: 'orders', name: 'Orders', component: () => import('../views/OrderList.vue'), meta: { title: '订单列表' } },
     ],
   },
 ]

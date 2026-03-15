@@ -71,4 +71,24 @@ public interface OrderService extends IService<Order> {
      * @return 是否成功
      */
     Boolean markOrderAsPaid(String orderNo, BigDecimal paidAmount);
+
+    /**
+     * 按仓库分页查询订单（管理端：仓库管理员看本仓，超管可查全部或指定仓）
+     *
+     * @param warehouseId 仓库ID（可为 null 表示查全部，仅超管有效）
+     * @param page        页码
+     * @param pageSize    每页大小
+     * @return 订单分页
+     */
+    IPage<OrderVO> listByWarehouseId(Long warehouseId, Integer page, Integer pageSize);
+
+    /**
+     * 发货：将订单状态更新为已发货（仅已支付可发货，仓库管理员只能发本仓订单）
+     *
+     * @param orderId      订单ID
+     * @param warehouseId  当前用户绑定仓库ID（仓库管理员时非空，用于校验）
+     * @param isSuperAdmin 是否超级管理员（超管不校验仓库）
+     * @return 是否成功
+     */
+    Boolean shipOrder(Long orderId, Long warehouseId, boolean isSuperAdmin);
 }

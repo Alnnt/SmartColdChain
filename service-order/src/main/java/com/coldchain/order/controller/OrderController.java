@@ -94,6 +94,53 @@ public class OrderController {
         return Result.success("支付完成，订单状态已更新", result);
     }
 
+    @Operation(summary = "管理端按仓库查询订单", description = "仓库管理员看本仓订单，超级管理员可传 warehouseId 或查全部")
+    @GetMapping("/manager/orders")
+    public Result<IPage<OrderVO>> listManagerOrders(
+            HttpServletRequest request,
+            @Parameter(description = "仓库ID（可选，超管不传则查全部）") @RequestParam(value = "warehouseId", required = false) String warehouseId,
+            @Parameter(description = "页码") @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @Parameter(description = "每页大小") @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+        String rolesHeader = request.getHeader("X-Roles");
+        String boundWarehouseId = request.getHeader("X-Warehouse-Id");
+        boolean isSuperAdmin = rolesHeader != null && rolesHeader.contains("ROLE_ADMIN");
+        Long resolvedWarehouseId = null;
+        if (StringUtils.hasText(warehouseId)) {
+            try {
+                resolvedWarehouseId = Long.parseLong(warehouseId.trim());
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        if (!isSuperAdmin && StringUtils.hasText(boundWarehouseId)) {
+            try {
+                resolvedWarehouseId = Long.parseLong(boundWarehouseId.trim());
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        IPage<OrderVO> orders = orderService.listByWarehouseId(resolvedWarehouseId, page, pageSize);
+        return Result.success(orders);
+    }
+
+    @Operation(summary = "发货", description = "将订单状态更新为已发货（仅已支付可发货）")
+    @PutMapping("/{orderId}/ship")
+    public Result<Boolean> shipOrder(
+            HttpServletRequest request,
+            @Parameter(description = "订单ID（文本）") @PathVariable("orderId") String orderIdStr) {
+        Long orderId = parseOrderId(orderIdStr);
+        String rolesHeader = request.getHeader("X-Roles");
+        String boundWarehouseId = request.getHeader("X-Warehouse-Id");
+        boolean isSuperAdmin = rolesHeader != null && rolesHeader.contains("ROLE_ADMIN");
+        Long warehouseId = null;
+        if (StringUtils.hasText(boundWarehouseId)) {
+            try {
+                warehouseId = Long.parseLong(boundWarehouseId.trim());
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        Boolean result = orderService.shipOrder(orderId, warehouseId, isSuperAdmin);
+        return Result.success("发货成功", result);
+    }
+
     /**
      * 从请求中获取用户ID（由网关转发时在Header中携带）
      */

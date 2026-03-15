@@ -52,6 +52,10 @@ public class User extends BaseEntity {
     @TableField("user_type")
     private Integer userType;
 
+    @Schema(description = "绑定仓库ID（仓库管理员必填）")
+    @TableField("warehouse_id")
+    private Long warehouseId;
+
     @Schema(description = "状态（0-禁用，1-正常）")
     @TableField("status")
     private Integer status;

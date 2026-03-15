@@ -3,6 +3,7 @@ package com.coldchain.inventory.service.impl;
 import com.coldchain.inventory.dto.DeductStockResponse;
 import com.coldchain.inventory.dto.InventoryItemDTO;
 import com.coldchain.inventory.dto.WarehouseStockDTO;
+import com.coldchain.inventory.entity.Inventory;
 import com.coldchain.inventory.entity.Warehouse;
 import com.coldchain.inventory.mapper.InventoryMapper;
 import com.coldchain.inventory.mapper.WarehouseMapper;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -180,15 +183,42 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<Warehouse> listWarehouses() {
+    public List<Warehouse> listWarehouses(Long warehouseId) {
+        if (warehouseId != null) {
+            Warehouse one = warehouseMapper.selectById(warehouseId);
+            return one != null ? List.of(one) : Collections.emptyList();
+        }
         List<Warehouse> list = warehouseMapper.selectList(null);
         return list != null ? list : Collections.emptyList();
     }
 
     @Override
-    public List<InventoryItemDTO> listInventoryItems() {
-        List<InventoryItemDTO> list = inventoryMapper.listInventoryItems();
+    public List<InventoryItemDTO> listInventoryItems(Long warehouseId) {
+        List<InventoryItemDTO> list = warehouseId != null
+                ? inventoryMapper.listInventoryItemsByWarehouseId(warehouseId)
+                : inventoryMapper.listInventoryItems();
         return list != null ? list : Collections.emptyList();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean addInventoryItem(Long warehouseId, Long productId, Integer quantity) {
+        if (warehouseId == null || productId == null || quantity == null || quantity < 1) {
+            return false;
+        }
+        LambdaQueryWrapper<Inventory> q = new LambdaQueryWrapper<>();
+        q.eq(Inventory::getWarehouseId, warehouseId).eq(Inventory::getProductId, productId);
+        Inventory existing = inventoryMapper.selectOne(q);
+        if (existing != null) {
+            return adjustStock(existing.getId(), quantity);
+        }
+        Inventory newInv = Inventory.builder()
+                .productId(productId)
+                .warehouseId(warehouseId)
+                .totalStock(quantity)
+                .frozenStock(0)
+                .build();
+        return inventoryMapper.insert(newInv) > 0;
     }
 
     @Override

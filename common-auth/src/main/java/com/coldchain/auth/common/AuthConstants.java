@@ -31,6 +31,16 @@ public class AuthConstants {
     public static final String USERNAME_HEADER = "X-Username";
 
     /**
+     * 角色列表请求头（网关传递给下游，逗号分隔）
+     */
+    public static final String ROLES_HEADER = "X-Roles";
+
+    /**
+     * 仓库ID请求头（仓库管理员时由网关注入）
+     */
+    public static final String WAREHOUSE_ID_HEADER = "X-Warehouse-Id";
+
+    /**
      * 请求ID
      */
     public static final String REQUEST_ID_HEADER = "X-Request-Id";
