@@ -5,8 +5,8 @@
       <nav class="nav">
         <template v-if="user">
           <span class="user-name">{{ user.nickname || user.username }}</span>
+          <router-link to="/products">商品</router-link>
           <router-link to="/orders">我的订单</router-link>
-          <router-link to="/create">去下单</router-link>
           <router-link to="/profile">个人中心</router-link>
           <button class="btn-link" type="button" @click="logout">退出</button>
         </template>
@@ -57,6 +57,7 @@ function logout() {
   --danger: #f85149;
   --radius: 10px;
   --font: 'Noto Sans SC', -apple-system, sans-serif;
+  --header-height: 56px;
 }
 
 * {
@@ -80,10 +81,16 @@ body {
 }
 
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 2rem;
+  min-height: var(--header-height);
+  padding: 0 2rem;
   background: var(--card);
   border-bottom: 1px solid var(--border);
 }
@@ -133,6 +140,7 @@ body {
 .main {
   flex: 1;
   padding: 2rem;
+  padding-top: calc(var(--header-height) + 2rem);
   max-width: 960px;
   margin: 0 auto;
   width: 100%;

@@ -27,6 +27,11 @@ public class OrderCreateDTO {
     private String productId;
 
     /**
+     * 商品名称（用于订单展示，可选，不传则留空）
+     */
+    private String productName;
+
+    /**
      * 购买数量
      */
     @NotNull(message = "购买数量不能为空")

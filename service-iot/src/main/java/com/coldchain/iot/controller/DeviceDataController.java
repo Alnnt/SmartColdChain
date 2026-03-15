@@ -68,7 +68,8 @@ public class DeviceDataController {
     @Operation(summary = "获取运单轨迹数据")
     @GetMapping("/waybill/{waybillId}/track")
     public Result<List<DeviceData>> getWaybillTrack(
-            @Parameter(description = "运单ID") @PathVariable Long waybillId) {
+            @Parameter(description = "运单ID（文本）") @PathVariable("waybillId") String waybillIdStr) {
+        Long waybillId = parseId(waybillIdStr, "运单ID");
         List<DeviceData> data = deviceDataService.getWaybillTrack(waybillId);
         return Result.success(data);
     }
@@ -89,5 +90,14 @@ public class DeviceDataController {
         status.put("totalMessages", ioTDataHandler.getMessageCount());
         status.put("serverTime", LocalDateTime.now());
         return Result.success(status);
+    }
+
+    private static Long parseId(String value, String name) {
+        if (value == null || value.isBlank()) throw new IllegalArgumentException(name + "不能为空");
+        try {
+            return Long.parseLong(value.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(name + "格式无效");
+        }
     }
 }

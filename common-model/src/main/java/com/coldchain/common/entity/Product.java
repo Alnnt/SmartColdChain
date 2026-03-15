@@ -15,4 +15,6 @@ public class Product {
     private Long id;
     private String name;
     private BigDecimal price;
+    /** 商品预览图完整 URL */
+    private String img;
 }

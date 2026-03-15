@@ -1,8 +1,11 @@
 package com.coldchain.inventory.service.impl;
 
 import com.coldchain.inventory.dto.DeductStockResponse;
+import com.coldchain.inventory.dto.InventoryItemDTO;
 import com.coldchain.inventory.dto.WarehouseStockDTO;
+import com.coldchain.inventory.entity.Warehouse;
 import com.coldchain.inventory.mapper.InventoryMapper;
+import com.coldchain.inventory.mapper.WarehouseMapper;
 import com.coldchain.inventory.service.InventoryService;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -24,6 +28,7 @@ import java.util.List;
 public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryMapper inventoryMapper;
+    private final WarehouseMapper warehouseMapper;
 
     /**
      * 鍦扮悆鍗婂緞锛堝叕閲岋級
@@ -172,6 +177,33 @@ public class InventoryServiceImpl implements InventoryService {
         log.info("回滚库存: productId={}, count={}", productId, count);
         int affected = inventoryMapper.rollbackStockByProductId(productId, count);
         return affected > 0;
+    }
+
+    @Override
+    public List<Warehouse> listWarehouses() {
+        List<Warehouse> list = warehouseMapper.selectList(null);
+        return list != null ? list : Collections.emptyList();
+    }
+
+    @Override
+    public List<InventoryItemDTO> listInventoryItems() {
+        List<InventoryItemDTO> list = inventoryMapper.listInventoryItems();
+        return list != null ? list : Collections.emptyList();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean adjustStock(Long inventoryId, Integer delta) {
+        if (delta == null || delta == 0) {
+            return false;
+        }
+        int affected = inventoryMapper.adjustStock(inventoryId, delta);
+        if (affected > 0) {
+            log.info("库存调整成功: inventoryId={}, delta={}", inventoryId, delta);
+            return true;
+        }
+        log.warn("库存调整失败（可能违反约束）: inventoryId={}, delta={}", inventoryId, delta);
+        return false;
     }
 
     /**

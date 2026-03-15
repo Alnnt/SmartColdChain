@@ -32,8 +32,9 @@ public class ApiInventoryController {
     @PostMapping("/decrease")
     @Operation(summary = "扣减库存")
     public Result<Boolean> decrease(
-            @RequestParam("productId") Long productId,
+            @RequestParam(value = "productId") String productIdStr,
             @RequestParam("count") Integer count) {
+        Long productId = parseLong(productIdStr, "商品ID");
         DeductStockRequest request = DeductStockRequest.builder()
                 .productId(productId)
                 .count(count)
@@ -57,9 +58,19 @@ public class ApiInventoryController {
     @PostMapping("/rollback")
     @Operation(summary = "回滚库存")
     public Result<Boolean> rollback(
-            @RequestParam("productId") Long productId,
+            @RequestParam(value = "productId") String productIdStr,
             @RequestParam("count") Integer count) {
+        Long productId = parseLong(productIdStr, "商品ID");
         boolean ok = inventoryService.rollbackStock(productId, count);
         return ok ? Result.success(true) : Result.fail("回滚失败");
+    }
+
+    private static Long parseLong(String value, String name) {
+        if (value == null || value.isBlank()) throw new IllegalArgumentException(name + "不能为空");
+        try {
+            return Long.parseLong(value.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(name + "格式无效");
+        }
     }
 }

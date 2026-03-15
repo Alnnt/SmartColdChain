@@ -1,6 +1,10 @@
 package com.coldchain.inventory.service;
 
 import com.coldchain.inventory.dto.DeductStockResponse;
+import com.coldchain.inventory.dto.InventoryItemDTO;
+import com.coldchain.inventory.entity.Warehouse;
+
+import java.util.List;
 
 /**
  * 库存服务接口
@@ -62,4 +66,19 @@ public interface InventoryService {
      * @return 是否成功
      */
     boolean rollbackStock(Long productId, Integer count);
+
+    /**
+     * 管理端：查询所有仓库
+     */
+    List<Warehouse> listWarehouses();
+
+    /**
+     * 管理端：查询库存列表（含仓库名称）
+     */
+    List<InventoryItemDTO> listInventoryItems();
+
+    /**
+     * 管理端：调整库存（正数增加、负数减少）
+     */
+    boolean adjustStock(Long inventoryId, Integer delta);
 }

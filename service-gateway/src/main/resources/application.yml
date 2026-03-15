@@ -54,6 +54,14 @@ spring:
             - Path=/api/inventory/**
           filters:
             - StripPrefix=0
+
+        # 商品服务
+        - id: service-product
+          uri: lb://service-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - StripPrefix=0
         
         # 运输服务
         - id: service-transport

@@ -62,10 +62,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         String orderNo = generateOrderNo();
 
         // 2. 创建订单
+        String productName = dto.getProductName() != null ? dto.getProductName() : "";
         Order order = Order.builder()
                 .orderNo(orderNo)
                 .userId(userId)
                 .productId(productId)
+                .productName(productName)
                 .productCount(dto.getProductCount())
                 .amount(dto.getAmount())
                 .status(OrderStatus.PENDING_PAYMENT.getCode())
@@ -78,8 +80,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         log.info("订单创建成功: orderId={}, orderNo={}", order.getId(), orderNo);
 
-        // 3. 调用库存服务扣减库存
-        Result<Boolean> inventoryResult = inventoryClient.decreaseStock(productId, dto.getProductCount());
+        // 3. 调用库存服务扣减库存（传文本 id 避免 Feign 序列化 Long 溢出）
+        Result<Boolean> inventoryResult = inventoryClient.decreaseStock(String.valueOf(productId), dto.getProductCount());
         if (!inventoryResult.isSuccess()) {
             log.error("库存扣减失败: {}", inventoryResult.getMessage());
             throw new BusinessException(ResultCode.INVENTORY_NOT_ENOUGH, inventoryResult.getMessage());
@@ -154,7 +156,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         boolean updated = this.updateById(order);
 
         if (updated) {
-            inventoryClient.rollbackStock(order.getProductId(), order.getProductCount());
+            inventoryClient.rollbackStock(String.valueOf(order.getProductId()), order.getProductCount());
             log.info("订单取消成功，库存已回滚: orderId={}", orderId);
         }
 

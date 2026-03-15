@@ -21,13 +21,13 @@ public class InventoryClientFallback implements FallbackFactory<InventoryClient>
 
         return new InventoryClient() {
             @Override
-            public Result<Boolean> decreaseStock(Long productId, Integer count) {
+            public Result<Boolean> decreaseStock(String productId, Integer count) {
                 log.warn("库存扣减降级: productId={}, count={}", productId, count);
                 return Result.fail("库存服务暂不可用，请稍后重试");
             }
 
             @Override
-            public Result<Boolean> rollbackStock(Long productId, Integer count) {
+            public Result<Boolean> rollbackStock(String productId, Integer count) {
                 log.warn("库存回滚降级: productId={}, count={}", productId, count);
                 return Result.fail("库存服务暂不可用，请稍后重试");
             }

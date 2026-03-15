@@ -1,6 +1,7 @@
 package com.coldchain.inventory.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.coldchain.inventory.dto.InventoryItemDTO;
 import com.coldchain.inventory.dto.WarehouseStockDTO;
 import com.coldchain.inventory.entity.Inventory;
 import org.apache.ibatis.annotations.Mapper;
@@ -138,4 +139,31 @@ public interface InventoryMapper extends BaseMapper<Inventory> {
             """)
     int rollbackStockByProductId(@Param("productId") Long productId,
             @Param("count") Integer count);
+
+    /**
+     * 管理端：查询库存列表（含仓库名称）
+     */
+    @Select("""
+            SELECT i.id, i.product_id AS productId, i.warehouse_id AS warehouseId,
+                   w.name AS warehouseName, i.total_stock AS totalStock,
+                   i.frozen_stock AS frozenStock,
+                   (i.total_stock - i.frozen_stock) AS availableStock
+            FROM t_inventory i
+            INNER JOIN t_warehouse w ON i.warehouse_id = w.id
+            WHERE i.deleted = 0 AND w.deleted = 0
+            ORDER BY i.warehouse_id, i.product_id
+            """)
+    List<InventoryItemDTO> listInventoryItems();
+
+    /**
+     * 管理端：调整库存（总库存增减，需保证调整后总库存 >= 0 且 >= 冻结库存）
+     */
+    @Update("""
+            UPDATE t_inventory
+            SET total_stock = total_stock + #{delta}, update_time = NOW()
+            WHERE id = #{inventoryId} AND deleted = 0
+              AND (total_stock + #{delta}) >= 0
+              AND (total_stock + #{delta}) >= frozen_stock
+            """)
+    int adjustStock(@Param("inventoryId") Long inventoryId, @Param("delta") Integer delta);
 }

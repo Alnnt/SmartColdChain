@@ -34,7 +34,7 @@ public class InventoryController {
      * 根据用户位置自动选择最近的仓库进行库存扣减
      */
     @PostMapping("/deduct")
-    @Operation(summary = "智能库存扣减", description = "根据用户位置自动选择最近的仓库进行库存扣减姩閫夋嫨鏈€杩戠殑浠撳簱杩涜搴撳瓨鎵ｅ噺")
+    @Operation(summary = "智能库存扣减", description = "根据用户位置自动选择最近的仓库进行库存扣减")
     public Result<DeductStockResponse> deductStock(@Valid @RequestBody DeductStockRequest request) {
         log.info("接收到库存扣减请求 {}", request);
 

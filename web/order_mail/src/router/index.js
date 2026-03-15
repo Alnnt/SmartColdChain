@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
   { path: '/', name: 'Home', component: () => import('../views/Home.vue'), meta: { title: '首页' } },
+  { path: '/products', name: 'ProductList', component: () => import('../views/ProductList.vue'), meta: { title: '浏览商品', auth: true } },
   { path: '/login', name: 'Login', component: () => import('../views/Login.vue'), meta: { title: '登录', guest: true } },
   { path: '/register', name: 'Register', component: () => import('../views/Register.vue'), meta: { title: '注册', guest: true } },
   { path: '/create', name: 'CreateOrder', component: () => import('../views/CreateOrder.vue'), meta: { title: '下单', auth: true } },

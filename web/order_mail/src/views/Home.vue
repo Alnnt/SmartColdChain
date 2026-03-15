@@ -8,7 +8,8 @@
     </div>
     <div v-else class="welcome">
       <p>欢迎，{{ user.nickname || user.username }}！</p>
-      <router-link to="/create" class="btn btn-primary">去下单</router-link>
+      <router-link to="/products" class="btn btn-primary">浏览商品</router-link>
+      <router-link to="/create" class="btn btn-secondary">购物车 / 去结算</router-link>
       <router-link to="/orders" class="btn btn-secondary">我的订单</router-link>
     </div>
   </div>

@@ -22,17 +22,17 @@ public interface InventoryClient {
      * @return 操作结果
      */
     @PostMapping("/api/inventory/decrease")
-    Result<Boolean> decreaseStock(@RequestParam("productId") Long productId,
+    Result<Boolean> decreaseStock(@RequestParam("productId") String productId,
                                   @RequestParam("count") Integer count);
 
     /**
      * 回滚库存（用于补偿）
      *
-     * @param productId 商品ID
+     * @param productId 商品ID（文本，避免 Long 溢出）
      * @param count     回滚数量
      * @return 操作结果
      */
     @PostMapping("/api/inventory/rollback")
-    Result<Boolean> rollbackStock(@RequestParam("productId") Long productId,
+    Result<Boolean> rollbackStock(@RequestParam("productId") String productId,
                                   @RequestParam("count") Integer count);
 }
