@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 /**
- * 鍒涘缓璁㈠崟璇锋眰 DTO
+ * 创建订单请求 DTO
  *
  * @author Alnnt
  */
@@ -21,28 +21,28 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class OrderCreateDTO {
     /**
-     * 鍟嗗搧ID
+     * 商品ID
      */
-    @NotNull(message = "鍟嗗搧ID涓嶈兘涓虹┖")
+    @NotNull(message = "商品ID不能为空")
     private Long productId;
 
     /**
-     * 璐拱鏁伴噺
+     * 购买数量
      */
-    @NotNull(message = "璐拱鏁伴噺涓嶈兘涓虹┖")
-    @Min(value = 1, message = "璐拱鏁伴噺鑷冲皯涓?")
+    @NotNull(message = "购买数量不能为空")
+    @Min(value = 1, message = "购买数量至少为1")
     private Integer productCount;
 
     /**
-     * 璁㈠崟閲戦
+     * 订单金额
      */
-    @NotNull(message = "璁㈠崟閲戦涓嶈兘涓虹┖")
-    @DecimalMin(value = "0.01", message = "璁㈠崟閲戦蹇呴』澶т簬0")
+    @NotNull(message = "订单金额不能为空")
+    @DecimalMin(value = "0.01", message = "订单金额必须大于0")
     private BigDecimal amount;
 
     /**
-     * 鏀惰揣鍦板潃ID
+     * 收货地址ID
      */
-    @NotNull(message = "鏀惰揣鍦板潃ID涓嶈兘涓虹┖")
+    @NotNull(message = "收货地址ID不能为空")
     private Long addressId;
 }

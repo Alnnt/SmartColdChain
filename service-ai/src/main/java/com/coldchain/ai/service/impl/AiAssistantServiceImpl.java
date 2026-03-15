@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
- * AI鍔╂墜鏈嶅姟瀹炵幇绫?
- * 浣跨敤Spring AI ChatClient涓嶭LM浜や簰
+ * AI助手服务实现类
+ * 使用Spring AI ChatClient与LLM交互
  *
  * @author Alnnt
  */
@@ -30,15 +30,15 @@ public class AiAssistantServiceImpl implements AiAssistantService {
 
     @Override
     public OrderChatResponse parseOrderFromNaturalLanguage(String naturalLanguageInput) {
-        log.debug("寮€濮嬭В鏋愯鍗? 杈撳叆: {}", naturalLanguageInput);
+        log.debug("开始解析订单 输入: {}", naturalLanguageInput);
 
         String response = null;
         try {
             response = orderAgent.call(naturalLanguageInput).getText();
-            log.debug("LLM鍝嶅簲: {}", response);
+            log.debug("LLM响应: {}", response);
             return new ObjectMapper().readValue(response, OrderChatResponse.class);
         } catch (Exception e) {
-            log.error("璁㈠崟瑙ｆ瀽澶辫触", e);
+            log.error("订单解析失败", e);
             OrderChatResponse fallback = new OrderChatResponse();
             fallback.setRawResponse(response);
             return fallback;
@@ -47,17 +47,17 @@ public class AiAssistantServiceImpl implements AiAssistantService {
 
     @Override
     public RiskAnalysisResponse analyzeTransportRisk(RiskAnalysisRequest request) {
-        log.debug("寮€濮嬪垎鏋愯繍杈撻闄? 璁惧ID: {}", request.getDeviceId());
+        log.debug("开始分析运输风险 设备ID: {}", request.getDeviceId());
 
         String userInput = buildRiskAnalysisInput(request);
         System.out.println(userInput);
         String response = null;
         try {
             response = riskAgent.call(userInput).getText();
-            log.debug("LLM椋庨櫓鍒嗘瀽鍝嶅簲: {}", response);
+            log.debug("LLM风险分析响应: {}", response);
             return new ObjectMapper().readValue(response, RiskAnalysisResponse.class);
         } catch (Exception e) {
-            log.error("椋庨櫓鍒嗘瀽澶辫触", e);
+            log.error("风险分析失败", e);
             RiskAnalysisResponse fallback = new RiskAnalysisResponse();
             fallback.setRiskLevel("UNKNOWN");
             fallback.setSummary("Error during risk analysis: " + e.getMessage());
@@ -67,7 +67,7 @@ public class AiAssistantServiceImpl implements AiAssistantService {
     }
 
     /**
-     * 鏋勫缓椋庨櫓鍒嗘瀽杈撳叆鏂囨湰
+     * 构建风险分析输入文本
      */
     private String buildRiskAnalysisInput(RiskAnalysisRequest request) {
         StringBuilder sb = new StringBuilder();
@@ -80,15 +80,15 @@ public class AiAssistantServiceImpl implements AiAssistantService {
         if (request.getAcceptableMinTemp() != null && request.getAcceptableMaxTemp() != null) {
             sb.append("Acceptable Temperature Range: ")
                     .append(request.getAcceptableMinTemp())
-                    .append("掳C to ")
+                    .append("°C to ")
                     .append(request.getAcceptableMaxTemp())
-                    .append("掳C\n");
+                    .append("°C\n");
         }
 
         if (request.getTemperatureReadings() != null && !request.getTemperatureReadings().isEmpty()) {
             sb.append("\nTemperature Readings:\n");
             request.getTemperatureReadings().forEach(reading -> sb.append("  - Time: ").append(reading.getTimestamp())
-                    .append(", Temp: ").append(reading.getTemperature()).append("掳C")
+                    .append(", Temp: ").append(reading.getTemperature()).append("°C")
                     .append(", Humidity: ").append(reading.getHumidity()).append("%\n"));
 
             // 璁＄畻缁熻淇℃伅
@@ -101,9 +101,9 @@ public class AiAssistantServiceImpl implements AiAssistantService {
             double maxTemp = temps.stream().mapToDouble(Double::doubleValue).max().orElse(0);
 
             sb.append("\nStatistics:\n");
-            sb.append("  - Average Temperature: ").append(String.format("%.2f", avgTemp)).append("掳C\n");
-            sb.append("  - Min Temperature: ").append(minTemp).append("掳C\n");
-            sb.append("  - Max Temperature: ").append(maxTemp).append("掳C\n");
+            sb.append("  - Average Temperature: ").append(String.format("%.2f", avgTemp)).append("°C\n");
+            sb.append("  - Min Temperature: ").append(minTemp).append("°C\n");
+            sb.append("  - Max Temperature: ").append(maxTemp).append("°C\n");
             sb.append("  - Total Readings: ").append(temps.size()).append("\n");
         }
 

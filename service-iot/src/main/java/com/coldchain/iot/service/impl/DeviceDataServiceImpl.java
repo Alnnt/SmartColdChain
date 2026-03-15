@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 璁惧鏁版嵁鏈嶅姟瀹炵幇
+ * 设备数据服务实现
  *
  * @author Alnnt
  */
@@ -37,27 +37,27 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     private final IoTConfig ioTConfig;
 
     /**
-     * 璁惧鐘舵€佺紦瀛樺墠缂€
+     * 设备状态缓存前缀
      */
     private static final String DEVICE_STATUS_PREFIX = "iot:device:status:";
 
     /**
-     * 璁惧鐘舵€佺紦瀛樿繃鏈熸椂闂达紙鍒嗛挓锛?
+     * 设备状态缓存过期时间（分钟）
      */
     private static final long DEVICE_STATUS_EXPIRE = 5;
 
     @Override
     public void processDeviceData(DeviceMessage message) {
-        // 1. 杞崲涓哄瓨鍌ㄥ疄浣?
+        // 1. 转换为存储实体
         DeviceData deviceData = convertToDeviceData(message);
 
-        // 3. 瀛樺偍鍒?MongoDB
+        // 3. 存储到 MongoDB
         deviceDataRepository.save(deviceData);
 
-        // 4. 鏇存柊璁惧鐘舵€佺紦瀛?
+        // 4. 更新设备状态缓存
         updateDeviceStatusCache(message.getDeviceId());
 
-        // 5. 鍙戦€佸埌 RocketMQ
+        // 5. 发送到 RocketMQ
         messageProducer.sendDeviceData(deviceData);
     }
 
@@ -91,7 +91,7 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     }
 
     /**
-     * 杞崲涓哄瓨鍌ㄥ疄浣?
+     * 转换为存储实体
      */
     private DeviceData convertToDeviceData(DeviceMessage message) {
         DeviceData.DeviceDataBuilder builder = DeviceData.builder()
@@ -101,13 +101,13 @@ public class DeviceDataServiceImpl implements DeviceDataService {
                 .waybillId(message.getWaybillId())
                 .timestamp(LocalDateTime.now());
 
-        // GPS鍧愭爣
+        // GPS坐标
         if (message.getGps() != null) {
             builder.longitude(message.getGps().getLongitude());
             builder.latitude(message.getGps().getLatitude());
         }
 
-        // 璁惧绔椂闂存埑杞崲
+        // 设备端时间戳转换
         if (message.getTimestamp() != null) {
             builder.timestamp(LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(message.getTimestamp()),
@@ -120,10 +120,10 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     }
 
     /**
-     * 妫€娴嬫姤璀︾姸鎬?
+     * 检测报警状态
      */
     private Integer checkAlarmStatus(DeviceData data) {
-        // 娓╁害寮傚父妫€娴?
+        // 温度异常检测
         if (data.getTemperature() != null) {
             if (data.getTemperature() < ioTConfig.getTemperatureMin() ||
                     data.getTemperature() > ioTConfig.getTemperatureMax()) {
@@ -131,7 +131,7 @@ public class DeviceDataServiceImpl implements DeviceDataService {
             }
         }
 
-        // 婀垮害寮傚父妫€娴?
+        // 湿度异常检测
         if (data.getHumidity() != null) {
             if (data.getHumidity() < ioTConfig.getHumidityMin() ||
                     data.getHumidity() > ioTConfig.getHumidityMax()) {
@@ -143,7 +143,7 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     }
 
     /**
-     * 鏇存柊璁惧鐘舵€佺紦瀛?
+     * 更新设备状态缓存
      */
     private void updateDeviceStatusCache(String deviceId) {
         String key = DEVICE_STATUS_PREFIX + deviceId;
@@ -152,10 +152,10 @@ public class DeviceDataServiceImpl implements DeviceDataService {
     }
 
     /**
-     * 妫€鏌ヨ澶囨槸鍚﹀湪绾?
+     * 检查设备是否在线
      */
     public boolean isDeviceOnline(String deviceId) {
         String key = DEVICE_STATUS_PREFIX + deviceId;
-        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+        return redisTemplate.hasKey(key);
     }
 }
