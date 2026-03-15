@@ -20,8 +20,8 @@ import java.util.List;
 @Schema(description = "用户信息")
 public class UserInfoVO {
 
-    @Schema(description = "用户ID")
-    private Long userId;
+    @Schema(description = "用户ID（文本传输，避免前端 Long 溢出）")
+    private String userId;
 
     @Schema(description = "用户名")
     private String username;

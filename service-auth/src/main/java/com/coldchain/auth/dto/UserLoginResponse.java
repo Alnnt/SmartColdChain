@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @Schema(description = "User login response")
 public class UserLoginResponse {
 
-    @Schema(description = "User ID")
-    private Long userId;
+    @Schema(description = "用户ID（文本传输，避免前端 Long 溢出）")
+    private String userId;
 
     @Schema(description = "Username")
     private String username;

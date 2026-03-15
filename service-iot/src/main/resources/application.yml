@@ -37,11 +37,11 @@ spring:
     nacos:
       discovery:
         server-addr: localhost:8848
-        namespace: cold-chain-dev
+        namespace: cold-chain
         group: DEFAULT_GROUP
       config:
         server-addr: localhost:8848
-        namespace: cold-chain-dev
+        namespace: cold-chain
         group: DEFAULT_GROUP
         file-extension: yaml
         refresh-enabled: true

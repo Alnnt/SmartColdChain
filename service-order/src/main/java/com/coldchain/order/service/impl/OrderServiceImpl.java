@@ -1,6 +1,5 @@
 package com.coldchain.order.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -53,8 +52,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     @GlobalTransactional(name = "create-order-tx", rollbackFor = Exception.class)
     public OrderVO createOrder(OrderCreateDTO dto, Long userId) {
+        Long productId = parseId(dto.getProductId(), "商品ID");
+        Long addressId = parseId(dto.getAddressId(), "收货地址ID");
         log.info("开始创建订单: userId={}, productId={}, count={}",
-                userId, dto.getProductId(), dto.getProductCount());
+                userId, productId, dto.getProductCount());
 
         // 1. 生成订单编号
         String orderNo = generateOrderNo();
@@ -63,11 +64,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Order order = Order.builder()
                 .orderNo(orderNo)
                 .userId(userId)
-                .productId(dto.getProductId())
+                .productId(productId)
                 .productCount(dto.getProductCount())
                 .amount(dto.getAmount())
                 .status(OrderStatus.PENDING_PAYMENT.getCode())
-                .addressId(dto.getAddressId())
+                .addressId(addressId)
                 .build();
 
         boolean saved = this.save(order);
@@ -77,19 +78,19 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         log.info("订单创建成功: orderId={}, orderNo={}", order.getId(), orderNo);
 
         // 3. 调用库存服务扣减库存
-        Result<Boolean> inventoryResult = inventoryClient.decreaseStock(dto.getProductId(), dto.getProductCount());
+        Result<Boolean> inventoryResult = inventoryClient.decreaseStock(productId, dto.getProductCount());
         if (!inventoryResult.isSuccess()) {
             log.error("库存扣减失败: {}", inventoryResult.getMessage());
             throw new BusinessException(ResultCode.INVENTORY_NOT_ENOUGH, inventoryResult.getMessage());
         }
-        log.info("库存扣减成功: productId={}, count={}", dto.getProductId(), dto.getProductCount());
+        log.info("库存扣减成功: productId={}, count={}", productId, dto.getProductCount());
 
         // 4. 调用运输服务创建运单
         WaybillCreateDTO waybillDTO = WaybillCreateDTO.builder()
                 .orderId(order.getId())
                 .orderNo(orderNo)
-                .addressId(dto.getAddressId())
-                .productId(dto.getProductId())
+                .addressId(addressId)
+                .productId(productId)
                 .count(dto.getProductCount())
                 .build();
 
@@ -220,11 +221,33 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         return "OD" + System.currentTimeMillis() + String.valueOf(id).substring(12);
     }
 
+    private static Long parseId(String id, String name) {
+        if (id == null || id.isBlank()) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, name + "不能为空");
+        }
+        try {
+            return Long.parseLong(id.trim());
+        } catch (NumberFormatException e) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, name + "格式无效");
+        }
+    }
+
     /**
-     * 转换为 VO
+     * 转换为 VO（ID 以文本形式输出，避免前端 Long 溢出）
      */
     private OrderVO convertToVO(Order order) {
-        OrderVO vo = BeanUtil.copyProperties(order, OrderVO.class);
+        OrderVO vo = OrderVO.builder()
+                .id(order.getId() != null ? String.valueOf(order.getId()) : null)
+                .orderNo(order.getOrderNo())
+                .userId(order.getUserId() != null ? String.valueOf(order.getUserId()) : null)
+                .productId(order.getProductId() != null ? String.valueOf(order.getProductId()) : null)
+                .count(order.getProductCount())
+                .amount(order.getAmount())
+                .status(order.getStatus())
+                .addressId(order.getAddressId() != null ? String.valueOf(order.getAddressId()) : null)
+                .waybillId(order.getWaybillId() != null ? String.valueOf(order.getWaybillId()) : null)
+                .createTime(order.getCreateTime())
+                .build();
         OrderStatus status = OrderStatus.of(order.getStatus());
         if (status != null) {
             vo.setStatusDesc(status.getDesc());

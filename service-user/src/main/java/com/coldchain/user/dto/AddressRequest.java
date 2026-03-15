@@ -2,7 +2,6 @@ package com.coldchain.user.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +20,8 @@ import lombok.NoArgsConstructor;
 @Schema(description = "地址请求")
 public class AddressRequest {
 
-    @Schema(description = "地址ID（编辑时必填）")
-    private Long id;
+    @Schema(description = "地址ID（编辑时必填，文本传输避免前端 Long 溢出）")
+    private String id;
 
     @NotBlank(message = "收货人姓名不能为空")
     @Schema(description = "收货人姓名", requiredMode = Schema.RequiredMode.REQUIRED)

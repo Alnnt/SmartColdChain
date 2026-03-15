@@ -46,15 +46,15 @@ public class AuthServiceImpl implements AuthService {
         SysUser user = findUserByUsernameOrPhone(request.getUsername());
 
         if (user == null) {
-            throw new BusinessException(ResultCode.USER_NOT_FOUND, "鐢ㄦ埛鍚嶆垨瀵嗙爜閿欒");
+            throw new BusinessException(ResultCode.USER_NOT_FOUND, "用户名或密码错误");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BusinessException(ResultCode.USER_PASSWORD_ERROR, "鐢ㄦ埛鍚嶆垨瀵嗙爜閿欒");
+            throw new BusinessException(ResultCode.USER_PASSWORD_ERROR, "用户名或密码错误");
         }
 
         if (user.getStatus() != null && user.getStatus() != 1) {
-            throw new BusinessException(ResultCode.USER_DISABLED, "璐﹀彿宸茶绂佺敤");
+            throw new BusinessException(ResultCode.USER_DISABLED, "账号已被禁用");
         }
 
         List<String> roleCodes = loadRoleCodes(user.getId());
@@ -63,10 +63,10 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtTokenUtil.generateAccessToken(user.getId(), user.getUsername(), roleCodes, permissionCodes);
         String refreshToken = jwtTokenUtil.generateRefreshToken(user.getId(), user.getUsername());
 
-        log.info("鐢ㄦ埛鐧诲綍鎴愬姛: username={}", user.getUsername());
+        log.info("用户登录成功: username={}", user.getUsername());
 
         return LoginResponse.builder()
-                .userId(user.getId())
+                .userId(user.getId() != null ? String.valueOf(user.getId()) : null)
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .avatar(user.getAvatar())
@@ -83,23 +83,23 @@ public class AuthServiceImpl implements AuthService {
         SysUser user = findUserByUsernameOrPhone(request.getUsername());
 
         if (user == null) {
-            throw new BusinessException(ResultCode.USER_NOT_FOUND, "鐢ㄦ埛鍚嶆垨瀵嗙爜閿欒");
+            throw new BusinessException(ResultCode.USER_NOT_FOUND, "用户名或密码错误");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BusinessException(ResultCode.USER_PASSWORD_ERROR, "鐢ㄦ埛鍚嶆垨瀵嗙爜閿欒");
+            throw new BusinessException(ResultCode.USER_PASSWORD_ERROR, "用户名或密码错误");
         }
 
         if (user.getStatus() != null && user.getStatus() != 1) {
-            throw new BusinessException(ResultCode.USER_DISABLED, "璐﹀彿宸茶绂佺敤");
+            throw new BusinessException(ResultCode.USER_DISABLED, "账号已被禁用");
         }
 
         String accessToken = jwtTokenUtil.generateAccessToken(user.getId(), user.getUsername());
 
-        log.info("鏅€氱敤鎴风櫥褰曟垚鍔? username={}", user.getUsername());
+        log.info("普通用户登录成功 username={}", user.getUsername());
 
         return UserLoginResponse.builder()
-                .userId(user.getId())
+                .userId(user.getId() != null ? String.valueOf(user.getId()) : null)
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .avatar(user.getAvatar())
@@ -112,15 +112,15 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(rollbackFor = Exception.class)
     public UserLoginResponse register(RegisterRequest request) {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "两次输入的密码不一致");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "两次输入的密码不一致");
         }
 
         if (userMapper.selectByUsername(request.getUsername()) != null) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "鐢ㄦ埛鍚嶅凡瀛樺湪");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "用户名已存在");
         }
 
         if (userMapper.selectByPhone(request.getPhone()) != null) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "手机号已被注册");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "手机号已注册");
         }
 
         SysUser user = SysUser.builder()
@@ -133,12 +133,12 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userMapper.insert(user);
-        log.info("鐢ㄦ埛娉ㄥ唽鎴愬姛: username={}", user.getUsername());
+        log.info("用户注册成功: username={}", user.getUsername());
 
         String accessToken = jwtTokenUtil.generateAccessToken(user.getId(), user.getUsername());
 
         return UserLoginResponse.builder()
-                .userId(user.getId())
+                .userId(user.getId() != null ? String.valueOf(user.getId()) : null)
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .avatar(user.getAvatar())
@@ -164,7 +164,7 @@ public class AuthServiceImpl implements AuthService {
 
         SysUser user = userMapper.selectById(userId);
         if (user == null || (user.getStatus() != null && user.getStatus() != 1)) {
-            throw new BusinessException(ResultCode.USER_DISABLED, "鐢ㄦ埛涓嶅瓨鍦ㄦ垨宸茶绂佺敤");
+            throw new BusinessException(ResultCode.USER_DISABLED, "用户不存在或已被禁用");
         }
 
         String newAccessToken;
@@ -177,7 +177,7 @@ public class AuthServiceImpl implements AuthService {
         }
         String newRefreshToken = jwtTokenUtil.generateRefreshToken(userId, username);
 
-        log.info("Token鍒锋柊鎴愬姛: username={}", username);
+        log.info("Token刷新成功: username={}", username);
 
         return TokenResponse.builder()
                 .accessToken(newAccessToken)
@@ -197,7 +197,7 @@ public class AuthServiceImpl implements AuthService {
         List<String> permissionCodes = loadPermissionCodes(userId);
 
         return UserInfoVO.builder()
-                .userId(user.getId())
+                .userId(user.getId() != null ? String.valueOf(user.getId()) : null)
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .phone(user.getPhone())
@@ -213,7 +213,7 @@ public class AuthServiceImpl implements AuthService {
         if (token != null && jwtTokenUtil.validateToken(token)) {
             String key = AuthConstants.TOKEN_BLACKLIST_PREFIX + token;
             redisTemplate.opsForValue().set(key, "1", jwtTokenUtil.getAccessTokenExpiration(), TimeUnit.SECONDS);
-            log.info("鐢ㄦ埛鐧诲嚭锛孴oken宸插姞鍏ラ粦鍚嶅崟");
+            log.info("用户登出，Token已加入黑名单");
         }
     }
 
@@ -221,7 +221,7 @@ public class AuthServiceImpl implements AuthService {
     public boolean validateToken(String token) {
         String key = AuthConstants.TOKEN_BLACKLIST_PREFIX + token;
         Boolean exists = redisTemplate.hasKey(key);
-        if (Boolean.TRUE.equals(exists)) {
+        if (exists) {
             return false;
         }
         return jwtTokenUtil.validateToken(token);

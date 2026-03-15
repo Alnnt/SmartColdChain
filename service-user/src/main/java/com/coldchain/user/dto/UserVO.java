@@ -18,8 +18,8 @@ import lombok.NoArgsConstructor;
 @Schema(description = "用户信息")
 public class UserVO {
 
-    @Schema(description = "用户ID")
-    private Long id;
+    @Schema(description = "用户ID（文本传输，避免前端 Long 溢出）")
+    private String id;
 
     @Schema(description = "用户名")
     private String username;

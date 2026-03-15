@@ -20,9 +20,9 @@ import java.time.LocalDateTime;
 public class OrderVO {
 
     /**
-     * 订单ID
+     * 订单ID（文本传输，避免前端 Long 溢出）
      */
-    private Long id;
+    private String id;
 
     /**
      * 订单编号
@@ -30,14 +30,14 @@ public class OrderVO {
     private String orderNo;
 
     /**
-     * 用户ID
+     * 用户ID（文本传输）
      */
-    private Long userId;
+    private String userId;
 
     /**
-     * 商品ID
+     * 商品ID（文本传输）
      */
-    private Long productId;
+    private String productId;
 
     /**
      * 购买数量
@@ -60,14 +60,14 @@ public class OrderVO {
     private String statusDesc;
 
     /**
-     * 收货地址ID
+     * 收货地址ID（文本传输）
      */
-    private Long addressId;
+    private String addressId;
 
     /**
-     * 运单ID
+     * 运单ID（文本传输）
      */
-    private Long waybillId;
+    private String waybillId;
 
     /**
      * 创建时间

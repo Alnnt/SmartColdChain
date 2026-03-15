@@ -18,8 +18,8 @@ import lombok.NoArgsConstructor;
 @Schema(description = "地址信息")
 public class AddressDTO {
 
-    @Schema(description = "地址ID")
-    private Long id;
+    @Schema(description = "地址ID（文本传输，避免前端 Long 溢出）")
+    private String id;
 
     @Schema(description = "收货人姓名")
     private String contactName;

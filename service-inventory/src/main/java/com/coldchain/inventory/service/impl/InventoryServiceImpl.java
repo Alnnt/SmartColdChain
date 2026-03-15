@@ -166,8 +166,16 @@ public class InventoryServiceImpl implements InventoryService {
         return true;
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean rollbackStock(Long productId, Integer count) {
+        log.info("回滚库存: productId={}, count={}", productId, count);
+        int affected = inventoryMapper.rollbackStockByProductId(productId, count);
+        return affected > 0;
+    }
+
     /**
-     * 鎵惧埌璺濈鐢ㄦ埛鏈€杩戠殑浠撳簱
+     * 鎵惧埌璺濈鐢ㄦ埛鏈€杩戠殑浠撳簱
      *
      * @param warehouses 浠撳簱鍒楄〃
      * @param userLat    鐢ㄦ埛绾害

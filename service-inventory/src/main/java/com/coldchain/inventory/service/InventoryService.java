@@ -53,4 +53,13 @@ public interface InventoryService {
      * @return 是否成功
      */
     boolean cancelFreeze(Long inventoryId, Integer count);
+
+    /**
+     * 按商品回滚库存（订单取消时调用，将数量加回该商品任一仓库）
+     *
+     * @param productId 商品ID
+     * @param count     回滚数量
+     * @return 是否成功
+     */
+    boolean rollbackStock(Long productId, Integer count);
 }

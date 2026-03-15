@@ -38,8 +38,8 @@ public class UserController {
     @Operation(summary = "更新用户信息")
     public Result<Void> updateUserInfo(
             HttpServletRequest request,
-            @Parameter(description = "昵称") @RequestParam(required = false) String nickname,
-            @Parameter(description = "头像URL") @RequestParam(required = false) String avatar) {
+            @Parameter(description = "昵称") @RequestParam(value = "nickname", required = false) String nickname,
+            @Parameter(description = "头像URL") @RequestParam(value = "avatar", required = false) String avatar) {
         Long userId = RequestUtil.getUserId();
         userService.updateUserInfo(userId, nickname, avatar);
         return Result.success();
@@ -49,8 +49,8 @@ public class UserController {
     @Operation(summary = "修改密码")
     public Result<Void> changePassword(
             HttpServletRequest request,
-            @Parameter(description = "旧密码") @RequestParam String oldPassword,
-            @Parameter(description = "新密码") @RequestParam String newPassword) {
+            @Parameter(description = "旧密码") @RequestParam("oldPassword") String oldPassword,
+            @Parameter(description = "新密码") @RequestParam("newPassword") String newPassword) {
         Long userId = RequestUtil.getUserId();
         userService.changePassword(userId, oldPassword, newPassword);
         return Result.success();

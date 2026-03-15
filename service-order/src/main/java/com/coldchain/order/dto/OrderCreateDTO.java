@@ -21,10 +21,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class OrderCreateDTO {
     /**
-     * 商品ID
+     * 商品ID（文本传输，避免前端 Long 溢出）
      */
     @NotNull(message = "商品ID不能为空")
-    private Long productId;
+    private String productId;
 
     /**
      * 购买数量
@@ -41,8 +41,8 @@ public class OrderCreateDTO {
     private BigDecimal amount;
 
     /**
-     * 收货地址ID
+     * 收货地址ID（文本传输，避免前端 Long 溢出）
      */
     @NotNull(message = "收货地址ID不能为空")
-    private Long addressId;
+    private String addressId;
 }

@@ -82,11 +82,11 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(Long userId, AddressRequest request) {
-        if (request.getId() == null) {
+        if (request.getId() == null || request.getId().isBlank()) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "地址ID不能为空");
         }
-
-        UserAddress address = addressMapper.selectById(request.getId());
+        Long addressId = parseAddressId(request.getId());
+        UserAddress address = addressMapper.selectById(addressId);
         if (address == null || !address.getUserId().equals(userId)) {
             throw new BusinessException(ResultCode.NOT_FOUND, "地址不存在");
         }
@@ -106,7 +106,15 @@ public class AddressServiceImpl implements AddressService {
         address.setLatitude(request.getLatitude());
         address.setIsDefault(Boolean.TRUE.equals(request.getIsDefault()) ? 1 : 0);
         addressMapper.updateById(address);
-        log.info("用户地址更新成功: userId={}, addressId={}", userId, request.getId());
+        log.info("用户地址更新成功: userId={}, addressId={}", userId, addressId);
+    }
+
+    private static Long parseAddressId(String id) {
+        try {
+            return Long.parseLong(id.trim());
+        } catch (NumberFormatException e) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "地址ID格式无效");
+        }
     }
 
     @Override
@@ -146,7 +154,7 @@ public class AddressServiceImpl implements AddressService {
                 address.getDistrict() + address.getDetail();
 
         return AddressDTO.builder()
-                .id(address.getId())
+                .id(address.getId() != null ? String.valueOf(address.getId()) : null)
                 .contactName(address.getContactName())
                 .contactPhone(address.getContactPhone())
                 .province(address.getProvince())

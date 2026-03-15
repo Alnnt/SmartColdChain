@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 /**
- * 璇锋眰鏃ュ織杩囨护鍣?
+ * 请求日志过滤器
  *
  * @author Alnnt
  */
@@ -27,14 +27,14 @@ public class RequestLogFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
-        // 鐢熸垚璇锋眰ID
+        // 生成请求ID
         String requestId = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
 
-        // 璁板綍寮€濮嬫椂闂?
+        // 记录开始时间
         long startTime = System.currentTimeMillis();
         exchange.getAttributes().put(START_TIME_ATTR, startTime);
 
-        // 娣诲姞璇锋眰ID鍒拌姹傚ご
+        // 添加请求ID到请求头
         ServerHttpRequest mutatedRequest = request.mutate()
                 .header(REQUEST_ID_HEADER, requestId)
                 .build();
@@ -44,7 +44,7 @@ public class RequestLogFilter implements GlobalFilter, Ordered {
         String query = request.getURI().getQuery();
         String clientIp = getClientIp(request);
 
-        log.info("[{}] 璇锋眰寮€濮? {} {} | IP: {} | Query: {}",
+        log.info("[{}] 请求开始 {} {} | IP: {} | Query: {}",
                 requestId, method, path, clientIp, query);
 
         return chain.filter(exchange.mutate().request(mutatedRequest).build())
@@ -55,14 +55,14 @@ public class RequestLogFilter implements GlobalFilter, Ordered {
                         int statusCode = exchange.getResponse().getStatusCode() != null
                                 ? exchange.getResponse().getStatusCode().value()
                                 : 0;
-                        log.info("[{}] 璇锋眰缁撴潫: {} {} | 鐘舵€? {} | 鑰楁椂: {}ms",
+                        log.info("[{}] 请求结束: {} {} | 状态 {} | 耗时: {}ms",
                                 requestId, method, path, statusCode, duration);
                     }
                 }));
     }
 
     /**
-     * 鑾峰彇瀹㈡埛绔湡瀹濱P
+     * 获取客户端真实IP
      */
     private String getClientIp(ServerHttpRequest request) {
         String ip = request.getHeaders().getFirst("X-Forwarded-For");
@@ -80,7 +80,7 @@ public class RequestLogFilter implements GlobalFilter, Ordered {
                     ? request.getRemoteAddress().getAddress().getHostAddress()
                     : "unknown";
         }
-        // 澶氭鍙嶅悜浠ｇ悊鍚庝細鏈夊涓狪P鍊硷紝绗竴涓狪P鎵嶆槸鐪熷疄IP
+        // 多次反向代理后会有多个IP值，第一个IP才是真实IP
         if (ip != null && ip.contains(",")) {
             ip = ip.split(",")[0].trim();
         }
@@ -89,7 +89,7 @@ public class RequestLogFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        // 鏈€楂樹紭鍏堢骇锛岀涓€涓墽琛?
+        // 最高优先级，第一个执行
         return Ordered.HIGHEST_PRECEDENCE;
     }
 }

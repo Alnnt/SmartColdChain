@@ -37,9 +37,12 @@ public class OrderController {
 
     @Operation(summary = "创建订单", description = "创建冷链物流订单，包含库存扣减和运单创建")
     @PostMapping("/create")
-    public Result<OrderVO> createOrder(@Valid @RequestBody OrderCreateDTO dto) {
-
-        OrderVO order = orderService.createOrder(dto, 1L);
+    public Result<OrderVO> createOrder(@Valid @RequestBody OrderCreateDTO dto, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("请先登录");
+        }
+        OrderVO order = orderService.createOrder(dto, userId);
         return Result.success(order);
     }
 
@@ -60,7 +63,8 @@ public class OrderController {
     @Operation(summary = "查询订单", description = "根据订单ID查询订单详情")
     @GetMapping("/{orderId}")
     public Result<OrderVO> getOrder(
-            @Parameter(description = "订单ID") @PathVariable Long orderId) {
+            @Parameter(description = "订单ID（文本）") @PathVariable("orderId") String orderIdStr) {
+        Long orderId = parseOrderId(orderIdStr);
         OrderVO order = orderService.getOrderById(orderId);
         return Result.success(order);
     }
@@ -76,7 +80,8 @@ public class OrderController {
     @Operation(summary = "取消订单", description = "取消待支付的订单")
     @PutMapping("/{orderId}/cancel")
     public Result<Boolean> cancelOrder(
-            @Parameter(description = "订单ID") @PathVariable Long orderId) {
+            @Parameter(description = "订单ID（文本）") @PathVariable("orderId") String orderIdStr) {
+        Long orderId = parseOrderId(orderIdStr);
         Boolean result = orderService.cancelOrder(orderId);
         return Result.success(result);
     }
@@ -98,5 +103,16 @@ public class OrderController {
             return Long.valueOf(userId);
         }
         return null;
+    }
+
+    private static Long parseOrderId(String id) {
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException("订单ID不能为空");
+        }
+        try {
+            return Long.parseLong(id.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("订单ID格式无效: " + id);
+        }
     }
 }

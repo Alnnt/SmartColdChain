@@ -35,15 +35,15 @@ spring:
   # Cloud 配置
   cloud:
     nacos:
-      # Nacos 服务发现
+      # Nacos 服务发现（与网关同一 namespace 以便网关与订单服务发现）
       discovery:
         server-addr: localhost:8848
-        namespace: cold-chain-dev
+        namespace: cold-chain
         group: DEFAULT_GROUP
       # Nacos 配置中心
       config:
         server-addr: localhost:8848
-        namespace: cold-chain-dev
+        namespace: cold-chain
         group: DEFAULT_GROUP
         file-extension: yaml
         refresh-enabled: true
@@ -71,13 +71,13 @@ seata:
     nacos:
       application: seata-server
       server-addr: localhost:8848
-      namespace: cold-chain-dev
+      namespace: cold-chain
       group: SEATA_GROUP
   config:
     type: nacos
     nacos:
       server-addr: localhost:8848
-      namespace: cold-chain-dev
+      namespace: cold-chain
       group: SEATA_GROUP
       data-id: seataServer.properties
   service:

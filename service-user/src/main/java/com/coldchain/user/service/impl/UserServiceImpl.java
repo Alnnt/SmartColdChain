@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
         }
 
         return UserVO.builder()
-                .id(user.getId())
+                .id(user.getId() != null ? String.valueOf(user.getId()) : null)
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .phone(user.getPhone())

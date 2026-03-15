@@ -28,12 +28,12 @@ spring:
       # Nacos服务发现配置
       discovery:
         server-addr: localhost:8848
-        namespace: cold-chain-dev
+        namespace: cold-chain
         group: DEFAULT_GROUP
       # Nacos配置中心
       config:
         server-addr: localhost:8848
-        namespace: cold-chain-dev
+        namespace: cold-chain
         group: DEFAULT_GROUP
         file-extension: yaml
         refresh-enabled: true

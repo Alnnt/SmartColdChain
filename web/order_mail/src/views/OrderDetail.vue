@@ -1,0 +1,156 @@
+<template>
+  <div class="order-detail">
+    <router-link to="/orders" class="back">← 返回订单列表</router-link>
+    <div v-if="loading" class="loading">加载中…</div>
+    <div v-else-if="!order" class="empty">订单不存在</div>
+    <div v-else class="card detail-card">
+      <h2>订单详情</h2>
+      <div class="detail-row">
+        <span class="label">订单号</span>
+        <span>{{ order.orderNo }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">订单状态</span>
+        <span class="status" :class="statusClass(order.status)">{{ order.statusDesc || statusText(order.status) }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">商品 ID</span>
+        <span>{{ order.productId }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">数量</span>
+        <span>{{ order.count }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">订单金额</span>
+        <span>¥{{ (order.amount || 0).toFixed(2) }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">收货地址 ID</span>
+        <span>{{ order.addressId }}</span>
+      </div>
+      <div class="detail-row" v-if="order.waybillId">
+        <span class="label">运单 ID</span>
+        <span>{{ order.waybillId }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">创建时间</span>
+        <span>{{ order.createTime }}</span>
+      </div>
+      <div v-if="order.status === 0" class="actions">
+        <button class="btn btn-secondary" @click="cancel">取消订单</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getOrderById, cancelOrder } from '../api/order'
+
+const route = useRoute()
+const router = useRouter()
+const order = ref(null)
+const loading = ref(true)
+
+// 使用字符串 ID，避免大数溢出
+const id = computed(() => String(route.params.id ?? ''))
+
+const STATUS_MAP = {
+  0: '待支付',
+  1: '已支付',
+  2: '已发货',
+  3: '已完成',
+  4: '已取消',
+}
+
+function statusText(code) {
+  return STATUS_MAP[code] ?? '未知'
+}
+
+function statusClass(code) {
+  const map = { 0: 'pending', 1: 'paid', 2: 'shipped', 3: 'done', 4: 'cancelled' }
+  return map[code] ?? ''
+}
+
+onMounted(async () => {
+  try {
+    const res = await getOrderById(id.value)
+    order.value = res.data
+  } catch (_) {
+    order.value = null
+  } finally {
+    loading.value = false
+  }
+})
+
+async function cancel() {
+  if (!confirm('确定取消该订单？')) return
+  try {
+    await cancelOrder(id.value)
+    order.value = { ...order.value, status: 4, statusDesc: '已取消' }
+  } catch (e) {
+    alert(e.message || '取消失败')
+  }
+}
+</script>
+
+<style scoped>
+.order-detail h2 {
+  margin-bottom: 1rem;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.loading,
+.empty {
+  color: var(--text-muted);
+  padding: 2rem;
+}
+
+.detail-card {
+  max-width: 480px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-row .label {
+  color: var(--text-muted);
+}
+
+.status.pending {
+  color: var(--warning);
+}
+
+.status.paid,
+.status.shipped {
+  color: var(--accent);
+}
+
+.status.done {
+  color: var(--success);
+}
+
+.status.cancelled {
+  color: var(--text-muted);
+}
+
+.actions {
+  margin-top: 1rem;
+}
+</style>

@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/web/order_mail/node_modules/

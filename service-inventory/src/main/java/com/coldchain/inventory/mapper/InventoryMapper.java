@@ -120,4 +120,22 @@ public interface InventoryMapper extends BaseMapper<Inventory> {
             """)
     int confirmDeductStock(@Param("inventoryId") Long inventoryId,
             @Param("count") Integer count);
+
+    /**
+     * 按商品回滚库存（订单取消时加回库存，任选该商品的一个仓库加回）
+     *
+     * @param productId 商品ID
+     * @param count     回滚数量
+     * @return 受影响行数
+     */
+    @Update("""
+            UPDATE t_inventory
+            SET total_stock = total_stock + #{count},
+                update_time = NOW()
+            WHERE product_id = #{productId}
+              AND deleted = 0
+            LIMIT 1
+            """)
+    int rollbackStockByProductId(@Param("productId") Long productId,
+            @Param("count") Integer count);
 }
