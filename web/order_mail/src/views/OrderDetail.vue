@@ -19,7 +19,7 @@
       </div>
       <div v-if="order.items?.length" class="item-list">
         <div v-for="(item, idx) in order.items" :key="item.id || idx" class="item-row">
-          <span>{{ item.productName || '商品 ' + (item.productId || '') }}</span>
+          <span>{{ item.productName || '—' }}</span>
           <span>× {{ item.count || 0 }}</span>
           <span>¥{{ (item.amount || 0).toFixed(2) }}</span>
         </div>
@@ -29,8 +29,8 @@
         <span>¥{{ (order.amount || 0).toFixed(2) }}</span>
       </div>
       <div class="detail-row">
-        <span class="label">收货地址 ID</span>
-        <span>{{ order.addressId }}</span>
+        <span class="label">收货地址</span>
+        <span class="address-text">{{ addressText }}</span>
       </div>
       <div class="detail-row" v-if="order.waybillId">
         <span class="label">运单 ID</span>
@@ -51,14 +51,28 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getOrderById, cancelOrder } from '../api/order'
+import { getAddressById } from '../api/address'
 
 const route = useRoute()
 const router = useRouter()
 const order = ref(null)
+const address = ref(null)
+const addressLoadFailed = ref(false)
 const loading = ref(true)
 
 // 使用字符串 ID，避免大数溢出
 const id = computed(() => String(route.params.id ?? ''))
+
+const addressText = computed(() => {
+  if (address.value) {
+    const a = address.value
+    const part = a.fullAddress || [a.province, a.city, a.district, a.detail].filter(Boolean).join(' ')
+    return [a.contactName, a.contactPhone, part].filter(Boolean).join(' ')
+  }
+  if (order.value?.addressId && addressLoadFailed.value) return `地址ID: ${order.value.addressId}`
+  if (order.value?.addressId) return '加载中…'
+  return '—'
+})
 
 const STATUS_MAP = {
   0: '待支付',
@@ -77,10 +91,30 @@ function statusClass(code) {
   return map[code] ?? ''
 }
 
+async function loadAddress(addressId) {
+  if (!addressId) {
+    address.value = null
+    addressLoadFailed.value = false
+    return
+  }
+  addressLoadFailed.value = false
+  try {
+    const res = await getAddressById(addressId)
+    address.value = res?.data ?? null
+    if (!address.value) addressLoadFailed.value = true
+  } catch (_) {
+    address.value = null
+    addressLoadFailed.value = true
+  }
+}
+
 onMounted(async () => {
   try {
     const res = await getOrderById(id.value)
     order.value = res.data
+    if (order.value?.addressId) {
+      await loadAddress(order.value.addressId)
+    }
   } catch (_) {
     order.value = null
   } finally {
@@ -134,6 +168,12 @@ async function cancel() {
 
 .detail-row .label {
   color: var(--text-muted);
+}
+
+.address-text {
+  max-width: 280px;
+  word-break: break-all;
+  text-align: right;
 }
 
 .item-list {

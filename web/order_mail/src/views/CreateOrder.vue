@@ -80,6 +80,7 @@ async function submit() {
       return {
         productId: String(product?.id),
         productCount: qty,
+        productName: product?.name ?? '',
         amount: price * qty,
       }
     })

@@ -35,6 +35,11 @@ public class OrderCreateItemDTO {
     private Integer productCount;
 
     /**
+     * 商品名称（用于订单展示，下单时由前端传入并落库）
+     */
+    private String productName;
+
+    /**
      * 本行金额（数量×单价）
      */
     @NotNull(message = "本行金额不能为空")

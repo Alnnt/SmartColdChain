@@ -14,7 +14,7 @@
         <thead>
           <tr>
             <th>订单编号</th>
-            <th>商品</th>
+            <th>商品明细</th>
             <th>数量</th>
             <th>金额</th>
             <th>状态</th>
@@ -25,8 +25,21 @@
         <tbody>
           <tr v-for="o in orders" :key="o.id">
             <td>{{ o.orderNo }}</td>
-            <td>{{ o.productName || `商品ID: ${o.productId}` }}</td>
-            <td>{{ o.count }}</td>
+            <td class="items-cell" @click="o.items?.length && openDetail(o)">
+              <template v-if="o.items?.length">
+                <div v-for="(item, idx) in o.items" :key="item.id || idx" class="item-line">
+                  {{ item.productName || '—' }} {{ item.count ?? 0 }}
+                </div>
+                <span class="detail-hint">点击查看详情</span>
+              </template>
+              <span v-else class="muted">—</span>
+            </td>
+            <td>
+              <template v-if="o.items?.length">
+                {{ o.items.reduce((s, it) => s + (it.count || 0), 0) }}
+              </template>
+              <span v-else>—</span>
+            </td>
             <td>¥{{ (o.amount != null ? Number(o.amount) : 0).toFixed(2) }}</td>
             <td>{{ o.statusDesc ?? statusText(o.status) }}</td>
             <td>{{ o.createTime }}</td>
@@ -55,6 +68,34 @@
         </button>
       </div>
     </div>
+
+    <!-- 商品明细弹窗 -->
+    <div v-if="detailOrder" class="modal-overlay" @click.self="detailOrder = null">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>订单 {{ detailOrder.orderNo }} 商品明细</h3>
+          <button type="button" class="modal-close" aria-label="关闭" @click="detailOrder = null">×</button>
+        </div>
+        <div class="modal-body">
+          <table class="detail-table">
+            <thead>
+              <tr>
+                <th>商品名</th>
+                <th>数量</th>
+                <th>商品ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, idx) in detailOrder.items" :key="item.id || idx">
+                <td>{{ item.productName || '—' }}</td>
+                <td>{{ item.count ?? 0 }}</td>
+                <td>{{ item.productId ?? '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -72,6 +113,11 @@ const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 const shippingId = ref(null)
+const detailOrder = ref(null)
+
+function openDetail(order) {
+  detailOrder.value = order
+}
 
 const warehouseIdParam = computed(() => effectiveWarehouseId.value || undefined)
 const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pageSize.value)))
@@ -164,6 +210,108 @@ onMounted(() => {
 
 .page-info {
   font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.items-cell {
+  max-width: 260px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.items-cell:hover .detail-hint {
+  opacity: 1;
+}
+
+.item-line {
+  font-size: 0.875rem;
+  padding: 0.2rem 0;
+  line-height: 1.4;
+}
+
+.item-line + .item-line {
+  border-top: 1px solid var(--border, #eee);
+}
+
+.detail-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+  margin-top: 0.25rem;
+  display: inline-block;
+}
+
+/* 弹窗 */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: var(--bg, #fff);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 360px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border, #eee);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0 0.25rem;
+}
+
+.modal-close:hover {
+  color: var(--text, #333);
+}
+
+.modal-body {
+  padding: 1rem 1.25rem;
+  overflow: auto;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.detail-table th,
+.detail-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border, #eee);
+}
+
+.detail-table th {
+  font-weight: 600;
   color: var(--text-muted);
 }
 </style>

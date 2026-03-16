@@ -88,7 +88,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             OrderItem item = OrderItem.builder()
                     .orderId(order.getId())
                     .productId(productId)
-                    .productName(null)
+                    .productName(itemDto.getProductName())
                     .count(itemDto.getProductCount())
                     .amount(itemDto.getAmount())
                     .inventoryId(freezeData != null ? freezeData.getInventoryId() : null)
