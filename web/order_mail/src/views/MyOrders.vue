@@ -10,7 +10,8 @@
           <span class="status" :class="statusClass(order.status)">{{ order.statusDesc || statusText(order.status) }}</span>
         </div>
         <div class="order-body">
-          <p>商品 ID：{{ order.productId }} · 数量：{{ order.count }} · 金额：¥{{ (order.amount || 0).toFixed(2) }}</p>
+          <p v-if="order.items?.length">共 {{ order.items.length }} 件商品 · 合计 ¥{{ (order.amount || 0).toFixed(2) }}</p>
+          <p v-else>合计 ¥{{ (order.amount || 0).toFixed(2) }}</p>
           <p class="time">{{ order.createTime }}</p>
         </div>
         <div class="order-actions">

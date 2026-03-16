@@ -135,6 +135,7 @@ public class InventoryServiceImpl implements InventoryService {
 
         return DeductStockResponse.builder()
                 .success(true)
+                .inventoryId(nearestWarehouse.getInventoryId())
                 .warehouseId(nearestWarehouse.getWarehouseId())
                 .warehouseName(nearestWarehouse.getWarehouseName())
                 .distance(Math.round(distance * 100.0) / 100.0)

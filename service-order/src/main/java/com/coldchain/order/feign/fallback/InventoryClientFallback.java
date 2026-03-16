@@ -22,6 +22,24 @@ public class InventoryClientFallback implements FallbackFactory<InventoryClient>
 
         return new InventoryClient() {
             @Override
+            public Result<DecreaseStockVO> freezeStock(String productId, Integer count) {
+                log.warn("库存冻结降级: productId={}, count={}", productId, count);
+                return Result.fail("库存服务暂不可用，请稍后重试");
+            }
+
+            @Override
+            public Result<Boolean> confirmDeduct(String inventoryId, Integer count) {
+                log.warn("确认扣减降级: inventoryId={}, count={}", inventoryId, count);
+                return Result.fail("库存服务暂不可用，请稍后重试");
+            }
+
+            @Override
+            public Result<Boolean> cancelFreeze(String inventoryId, Integer count) {
+                log.warn("取消冻结降级: inventoryId={}, count={}", inventoryId, count);
+                return Result.fail("库存服务暂不可用，请稍后重试");
+            }
+
+            @Override
             public Result<DecreaseStockVO> decreaseStock(String productId, Integer count) {
                 log.warn("库存扣减降级: productId={}, count={}", productId, count);
                 return Result.fail("库存服务暂不可用，请稍后重试");

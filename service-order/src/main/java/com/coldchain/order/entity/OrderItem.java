@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 /**
- * 订单主表（一个订单可包含多个商品明细，见 t_order_item）
+ * 订单明细（一个订单可包含多个商品项）
  *
  * @author ColdChain
  */
@@ -21,33 +21,27 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName("t_order")
-public class Order extends BaseEntity {
+@TableName("t_order_item")
+public class OrderItem extends BaseEntity {
 
-    @TableField("order_no")
-    private String orderNo;
+    @TableField("order_id")
+    private Long orderId;
 
-    @TableField("user_id")
-    private Long userId;
+    @TableField("product_id")
+    private Long productId;
 
-    /**
-     * 订单总金额
-     */
+    @TableField("product_name")
+    private String productName;
+
+    @TableField("count")
+    private Integer count;
+
     @TableField("amount")
     private BigDecimal amount;
 
-    @TableField("status")
-    private Integer status;
+    @TableField("inventory_id")
+    private Long inventoryId;
 
-    /**
-     * 履约仓库ID（取第一个明细的仓库，用于管理端筛选）
-     */
     @TableField("warehouse_id")
     private Long warehouseId;
-
-    @TableField("address_id")
-    private Long addressId;
-
-    @TableField("waybill_id")
-    private Long waybillId;
 }

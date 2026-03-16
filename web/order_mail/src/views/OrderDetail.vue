@@ -13,13 +13,16 @@
         <span class="label">订单状态</span>
         <span class="status" :class="statusClass(order.status)">{{ order.statusDesc || statusText(order.status) }}</span>
       </div>
-      <div class="detail-row">
-        <span class="label">商品 ID</span>
-        <span>{{ order.productId }}</span>
+      <div class="detail-row" v-if="order.items?.length">
+        <span class="label">商品明细</span>
+        <span></span>
       </div>
-      <div class="detail-row">
-        <span class="label">数量</span>
-        <span>{{ order.count }}</span>
+      <div v-if="order.items?.length" class="item-list">
+        <div v-for="(item, idx) in order.items" :key="item.id || idx" class="item-row">
+          <span>{{ item.productName || '商品 ' + (item.productId || '') }}</span>
+          <span>× {{ item.count || 0 }}</span>
+          <span>¥{{ (item.amount || 0).toFixed(2) }}</span>
+        </div>
       </div>
       <div class="detail-row">
         <span class="label">订单金额</span>
@@ -131,6 +134,19 @@ async function cancel() {
 
 .detail-row .label {
   color: var(--text-muted);
+}
+
+.item-list {
+  margin: 0.5rem 0;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--border);
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+  font-size: 0.9rem;
 }
 
 .status.pending {

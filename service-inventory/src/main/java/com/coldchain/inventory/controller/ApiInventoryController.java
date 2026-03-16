@@ -53,7 +53,49 @@ public class ApiInventoryController {
     }
 
     /**
-     * 按商品回滚库存（订单取消时加回）
+     * 冻结库存（下单时预占，不实际扣减）
+     */
+    @PostMapping("/freeze")
+    @Operation(summary = "冻结库存")
+    public Result<DeductStockResponse> freeze(
+            @RequestParam(value = "productId") String productIdStr,
+            @RequestParam("count") Integer count) {
+        Long productId = parseLong(productIdStr, "商品ID");
+        DeductStockResponse response = inventoryService.freezeStock(productId, count, 0.0, 0.0);
+        if (response.getSuccess()) {
+            return Result.success(response);
+        }
+        return Result.fail("库存不足，冻结失败");
+    }
+
+    /**
+     * 确认扣减（支付成功时：冻结转实际扣减）
+     */
+    @PostMapping("/confirm-deduct")
+    @Operation(summary = "确认扣减")
+    public Result<Boolean> confirmDeduct(
+            @RequestParam(value = "inventoryId") String inventoryIdStr,
+            @RequestParam("count") Integer count) {
+        Long inventoryId = parseLong(inventoryIdStr, "库存ID");
+        boolean ok = inventoryService.confirmDeduct(inventoryId, count);
+        return ok ? Result.success(true) : Result.fail("确认扣减失败");
+    }
+
+    /**
+     * 取消冻结（订单取消时释放预占）
+     */
+    @PostMapping("/cancel-freeze")
+    @Operation(summary = "取消冻结")
+    public Result<Boolean> cancelFreeze(
+            @RequestParam(value = "inventoryId") String inventoryIdStr,
+            @RequestParam("count") Integer count) {
+        Long inventoryId = parseLong(inventoryIdStr, "库存ID");
+        boolean ok = inventoryService.cancelFreeze(inventoryId, count);
+        return ok ? Result.success(true) : Result.fail("取消冻结失败");
+    }
+
+    /**
+     * 按商品回滚库存（订单取消时加回，仅用于未冻结直接扣减的兼容场景）
      */
     @PostMapping("/rollback")
     @Operation(summary = "回滚库存")

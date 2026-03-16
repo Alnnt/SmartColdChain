@@ -6,18 +6,16 @@ CREATE DATABASE IF NOT EXISTS `cold_chain_order` DEFAULT CHARACTER SET utf8mb4 C
 
 USE `cold_chain_order`;
 
--- ==================== 订单表 ====================
+-- ==================== 订单主表（一个订单对应多个明细见 t_order_item） ====================
+DROP TABLE IF EXISTS `t_order_item`;
 DROP TABLE IF EXISTS `t_order`;
 CREATE TABLE `t_order` (
     `id` BIGINT NOT NULL COMMENT '主键ID',
     `order_no` VARCHAR(64) NOT NULL COMMENT '订单编号',
     `user_id` BIGINT NOT NULL COMMENT '用户ID',
-    `product_id` BIGINT NOT NULL COMMENT '商品ID',
-    `product_name` VARCHAR(255) DEFAULT NULL COMMENT '商品名称',
-    `count` INT NOT NULL DEFAULT 1 COMMENT '购买数量',
-    `amount` DECIMAL(12, 2) NOT NULL COMMENT '订单金额',
+    `amount` DECIMAL(12, 2) NOT NULL COMMENT '订单总金额',
     `status` TINYINT NOT NULL DEFAULT 0 COMMENT '订单状态（0-待支付，1-已支付，2-已发货，3-已完成，4-已取消）',
-    `warehouse_id` BIGINT DEFAULT NULL COMMENT '履约仓库ID',
+    `warehouse_id` BIGINT DEFAULT NULL COMMENT '履约仓库ID（首项仓库，管理端筛选用）',
     `address_id` BIGINT DEFAULT NULL COMMENT '收货地址ID',
     `waybill_id` BIGINT DEFAULT NULL COMMENT '运单ID',
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -30,6 +28,24 @@ CREATE TABLE `t_order` (
     KEY `idx_status` (`status`),
     KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单表';
+
+-- ==================== 订单明细表 ====================
+CREATE TABLE `t_order_item` (
+    `id` BIGINT NOT NULL COMMENT '主键ID',
+    `order_id` BIGINT NOT NULL COMMENT '订单ID',
+    `product_id` BIGINT NOT NULL COMMENT '商品ID',
+    `product_name` VARCHAR(255) DEFAULT NULL COMMENT '商品名称',
+    `count` INT NOT NULL DEFAULT 1 COMMENT '数量',
+    `amount` DECIMAL(12, 2) NOT NULL COMMENT '本行金额',
+    `inventory_id` BIGINT DEFAULT NULL COMMENT '冻结库存ID',
+    `warehouse_id` BIGINT DEFAULT NULL COMMENT '仓库ID',
+    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '删除标志',
+    PRIMARY KEY (`id`),
+    KEY `idx_order_id` (`order_id`),
+    KEY `idx_product_id` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单明细表';
 
 -- ==================== Seata undo_log 表（AT模式必需）====================
 DROP TABLE IF EXISTS `undo_log`;

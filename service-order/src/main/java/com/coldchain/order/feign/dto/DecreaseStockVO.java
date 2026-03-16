@@ -15,5 +15,7 @@ import lombok.NoArgsConstructor;
 public class DecreaseStockVO {
 
     private Boolean success;
+    /** 库存记录ID（冻结时返回，支付时确认扣减用） */
+    private Long inventoryId;
     private Long warehouseId;
 }

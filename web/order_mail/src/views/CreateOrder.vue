@@ -73,24 +73,31 @@ async function submit() {
   success.value = ''
   loading.value = true
   try {
-    const orderNos = []
-    for (const it of cartItems.value) {
+    const items = cartItems.value.map((it) => {
       const product = it.product
       const qty = it.quantity || 1
-      const amount = (Number(product?.price) || 0) * qty
-      const res = await createOrder({
+      const price = Number(product?.price) || 0
+      return {
         productId: String(product?.id),
-        productName: product?.name ?? '',
         productCount: qty,
-        amount,
-        addressId: String(addressId.value),
-      })
-      const order = res?.data
-      if (order?.orderNo) orderNos.push(order.orderNo)
+        amount: price * qty,
+      }
+    })
+    const amount = items.reduce((sum, it) => sum + it.amount, 0)
+    const res = await createOrder({
+      items,
+      amount,
+      addressId: String(addressId.value),
+    })
+    const order = res?.data
+    if (!order?.orderNo) {
+      success.value = '未生成订单'
+      return
     }
     clearCart()
-    success.value = orderNos.length > 0 ? `已成功创建 ${orderNos.length} 笔订单` : '订单已提交'
-    setTimeout(() => router.push('/orders'), 1500)
+    const payPayload = [{ orderNo: order.orderNo, amount: order.amount ?? amount }]
+    sessionStorage.setItem('pendingPayOrders', JSON.stringify(payPayload))
+    router.push({ name: 'PayConfirm', state: { orders: payPayload } })
   } catch (e) {
     error.value = e.message || '下单失败'
   } finally {

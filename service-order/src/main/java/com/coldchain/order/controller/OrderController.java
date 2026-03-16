@@ -50,8 +50,8 @@ public class OrderController {
     @GetMapping("/my")
     public Result<IPage<OrderVO>> listMyOrders(
             HttpServletRequest request,
-            @Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer page,
-            @Parameter(description = "每页大小") @RequestParam(defaultValue = "10") Integer pageSize) {
+            @Parameter(description = "页码") @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @Parameter(description = "每页大小") @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
         Long userId = getUserIdFromRequest(request);
         if (userId == null) {
             return Result.fail("请先登录");
